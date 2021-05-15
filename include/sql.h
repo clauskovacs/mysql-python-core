@@ -1,5 +1,5 @@
-#ifndef __SQL_H_INCLUDED__
-#define __SQL_H_INCLUDED__
+#ifndef TISS_CRAWLER__SQL_H
+#define TISS_CRAWLER__SQL_H
 
 int test(int z1, int z2);
 

@@ -1,5 +1,5 @@
-#ifndef __CRAWL_H_INCLUDED__
-#define __CRAWL_H_INCLUDED__
+#ifndef TISS_CRAWLER__CRAWL_H
+#define TISS_CRAWLER__CRAWL_H
 
 int test2(int z1, int z2);
 
