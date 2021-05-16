@@ -30,7 +30,7 @@ sleep(2)
 
 # fetch the contents in the targed div (id = contentInner)
 html = driver.execute_script('return window.document.getElementById("contentInner").innerHTML')
-print html
+print(html)
 
 
 driver.close()	# close the current browser window
