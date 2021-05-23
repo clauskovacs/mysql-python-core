@@ -12,7 +12,6 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox") # linux only
 chrome_options.add_argument("--headless")
 
-
 # change the user agent
 chrome_options.add_argument("user-agent = Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
 
@@ -31,7 +30,6 @@ sleep(2)
 # fetch the contents in the targed div (id = contentInner)
 html = driver.execute_script('return window.document.getElementById("contentInner").innerHTML')
 print(html)
-
 
 driver.close()	# close the current browser window
 driver.quit()	# calls driver.dispose which closes all the browser windows and ends the WebDriver session properly
