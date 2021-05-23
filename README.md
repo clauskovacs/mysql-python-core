@@ -5,5 +5,5 @@ TISS (TU Wien Informations-Systeme & Services) Crawler
 Program to crawl TISS (TU Wien Informations-Systeme & Services) and extract data
 
 ## Running the Crawler
-Use the makefile to build and run the crawler.
+Use the makefile to run the crawler.
 
