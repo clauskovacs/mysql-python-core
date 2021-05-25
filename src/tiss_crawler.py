@@ -2,13 +2,15 @@
 #!/usr/bin/python3
 
 import crawl
+import sqlhandler
 
+# crawling events testing
 driver_instance = crawl.crawler(True, 800, 600)
-
 driver = driver_instance.init_driver()
-
 driver_instance.fetch_page(driver)
-
 driver_instance.close_driver(driver)
+
+# sql handler testing
+
 
 print ('exiting\n')
