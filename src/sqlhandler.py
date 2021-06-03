@@ -4,20 +4,21 @@
 import mysql.connector as database
 import importlib.machinery
 loginCredentials = importlib.machinery.SourceFileLoader('login_credentials','conf/login_credentials.py').load_module()	# load sql login credentials from an external file
-#import os
 
-print('init sql handler')
+class sqlhandler:
+	def __init__(self):
+		print ('creating sqlhandler class object')
 
-sqlLoginUser = loginCredentials.loginData["user"]
-sqlLoginPassword = loginCredentials.loginData["password"]
-sqlLoginHost = loginCredentials.loginData["host"]
+		# set the login credentials
+		self.sqlLoginUser = loginCredentials.loginData["user"]
+		self.sqlLoginPassword = loginCredentials.loginData["password"]
+		self.sqlLoginHost = loginCredentials.loginData["host"]
 
-sqlSelectDatabase = "bookstore"
+	def testfetchDB(self, sqlSelectDatabase):
+		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+		cursor = connection.cursor()
 
-connection = database.connect(user = sqlLoginUser, password = sqlLoginPassword, host = sqlLoginHost, database = sqlSelectDatabase)
-cursor = connection.cursor()
+		cursor.execute("SELECT * FROM books")
+		lst = cursor.fetchall()
 
-cursor.execute("SELECT * FROM books")
-lst = cursor.fetchall()
-
-print(lst)
+		print(lst)
