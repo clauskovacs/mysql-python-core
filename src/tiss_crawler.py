@@ -12,7 +12,21 @@ import sqlhandler
 
 # sql handler testing
 sqlhandlerTest = sqlhandler.sqlhandler()
-sqlhandlerTest.testfetchDB("bookstore")
+
+# fetch all existing DB
+print('\nfetching all existing DB:')
+returnAllDB = sqlhandlerTest.fetchAllDB(1)
+
+print('\n')
+
+selectDB = returnAllDB[0]['Database']
+print ('fetching all tables for DB: ' + selectDB)
+listStructureDB = sqlhandlerTest.fetchAllTablesfromDB(selectDB, 1)
+
+print('\n')
+
+sqlhandlerTest.fetchTableContent(selectDB, listStructureDB[0]['Tables_in_' + selectDB], 1)
 
 
-print ('exiting\n')
+
+print ('\nexiting')
