@@ -22,6 +22,8 @@ class sqlhandler:
 		cursor.execute("SHOW DATABASES")
 		queryAllDB = cursor.fetchall()
 
+		connection.close()
+
 		# cout all found databases
 		if verbose == 1:
 			for row in queryAllDB:
@@ -36,6 +38,8 @@ class sqlhandler:
 
 		cursor.execute("SHOW TABLES")
 		queryAllTables = cursor.fetchall()
+
+		connection.close()
 
 		# cout the information
 		if verbose == 1:
@@ -59,9 +63,21 @@ class sqlhandler:
 
 		# fetch/print the table column data
 		cursor.execute("SELECT * FROM " + sqlSelectTable)
+		#print('   -> ', sqlSelectTable)
 		fetchTableContent = cursor.fetchall()
+
+		connection.close()
 
 		# cout the table information
 		if verbose == 1:
-			for i in range(len(fetchTableContent[0])):
-				print(f"{str(fetchTableContent[0][i]):>20} ", end = '')
+			for i in range(len(fetchTableContent)):
+				print(fetchTableContent[i])
+				#print(f"{str(fetchTableContent[0][i]):>20} ", end = '')
+
+	# Insert data into a Table
+	def insertIntoTable(self, sqlSelectDatabase, insertStatement, insertData):
+		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+		cursor = connection.cursor()
+		cursor.execute(insertStatement, insertData)
+		connection.commit()
+		connection.close()

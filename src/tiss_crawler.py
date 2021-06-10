@@ -10,23 +10,35 @@ import sqlhandler
 #driver_instance.fetch_page(driver)
 #driver_instance.close_driver(driver)
 
-# sql handler testing
+## sql handler testing ##
 sqlhandlerTest = sqlhandler.sqlhandler()
 
-# fetch all existing DB
+## fetch all existing DB ##
 print('\nfetching all existing DB:')
 returnAllDB = sqlhandlerTest.fetchAllDB(1)
 
 print('\n')
 
+## fetch all tables from a DB ##
 selectDB = returnAllDB[0]['Database']
 print ('fetching all tables for DB: ' + selectDB)
 listStructureDB = sqlhandlerTest.fetchAllTablesfromDB(selectDB, 1)
 
 print('\n')
 
-sqlhandlerTest.fetchTableContent(selectDB, listStructureDB[0]['Tables_in_' + selectDB], 1)
+selectTable = listStructureDB[0]['Tables_in_' + selectDB]
+sqlhandlerTest.fetchTableContent(selectDB, selectTable, 1)
 
+print('\n')
+
+## INSERT TEST ##
+insertStatement = (
+	"INSERT INTO " + selectTable +" (name_last, name_first, country) "
+	"VALUES (%s, %s, %s)"
+)
+insertData = ('Jane', 'Doe', 'muh')
+
+sqlhandlerTest.insertIntoTable(selectDB, insertStatement, insertData)
 
 
 print ('\nexiting')
