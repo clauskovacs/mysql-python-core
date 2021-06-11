@@ -76,13 +76,42 @@ class sqlhandler:
 
 		return fetchTableContentData, fetchTableHeader
 
-	# Insert data into a Table
+	# insert data into a Table
 	def insertIntoTable(self, sqlSelectDatabase, insertStatement, insertData):
 		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
 		cursor = connection.cursor()
 		cursor.execute(insertStatement, insertData)
 		connection.commit()
 		connection.close()
+
+	# create a new table
+	def createTable(self, sqlSelectDatabase, tableName, columnInfo):
+		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+		cursor = connection.cursor()
+
+		# check, whether the table already exists
+		getAllTables = self.fetchAllTablesfromDB(sqlSelectDatabase, 0)
+		tableFound = False
+
+		for i in getAllTables:
+			if i['Tables_in_'+sqlSelectDatabase] == tableName:
+				print('table', tableName, "already exists in the DB")
+				tableFound = True
+				break
+
+		if tableFound == False:
+			cursor.execute("CREATE TABLE customers (" + columnInfo + ")")
+
+		connection.close()
+
+	# delete a table
+	def dropTable(self, sqlSelectDatabase, deleteTableName):
+		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+		cursor = connection.cursor()
+		sql = "DROP TABLE " + deleteTableName
+		cursor.execute(sql) 
+		connection.close()
+
 
 	# export a table (into a file on the disk). This file can for example be used in phpMyadmin to import the table
 	def exportTable(self, path, createNewTable, exportDB, exportTable):
@@ -165,5 +194,3 @@ class sqlhandler:
 			f.write("\nCOMMIT;")
 
 		f.close()
-
-
