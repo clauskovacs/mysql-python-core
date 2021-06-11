@@ -32,6 +32,7 @@ sqlhandlerTest.fetchTableContent(selectDB, selectTable, 1)
 print('\n')
 
 ## INSERT TEST ##
+"""
 insertStatement = (
 	"INSERT INTO " + selectTable +" (name_last, name_first, country) "
 	"VALUES (%s, %s, %s)"
@@ -39,6 +40,12 @@ insertStatement = (
 insertData = ('Jane', 'Doe', 'muh')
 
 sqlhandlerTest.insertIntoTable(selectDB, insertStatement, insertData)
+"""
 
+## EXPORT TABLE TEST ##
+path = "sql_IO/"
+filename = "sql_export_test.sql"
+createNewTable = 1
+sqlhandlerTest.exportTable(path+filename, createNewTable, "bookstore", "books")
 
 print ('\nexiting')
