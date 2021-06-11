@@ -13,6 +13,7 @@ import sqlhandler
 ## sql handler testing ##
 sqlhandlerTest = sqlhandler.sqlhandler()
 
+"""
 ## fetch all existing DB ##
 print('\nfetching all existing DB:')
 returnAllDB = sqlhandlerTest.fetchAllDB(1)
@@ -30,6 +31,7 @@ selectTable = listStructureDB[0]['Tables_in_' + selectDB]
 sqlhandlerTest.fetchTableContent(selectDB, selectTable, 1)
 
 print('\n')
+"""
 
 ## INSERT TEST ##
 """
@@ -47,16 +49,24 @@ sqlhandlerTest.insertIntoTable(selectDB, insertStatement, insertData)
 ## EXPORT TABLE TEST ##
 path = "sql_IO/"
 filename = "sql_export_test.sql"
-createNewTable = 1
-sqlhandlerTest.exportTable(path+filename, createNewTable, "bookstore", "books")
+appendOnly = 1	# export with CREATE TABLE
+sqlhandlerTest.exportTable(path+filename, appendOnly, "bookstore", "books")
 """
 
+"""
 ## CREATE TABLE TEST ##
 columnInfo = "name VARCHAR(255), address VARCHAR(255)"
 tableName = "customers"
 sqlhandlerTest.createTable("bookstore", tableName, columnInfo)
+"""
 
 ## DELETE TABLE TEST ##
 #sqlhandlerTest.dropTable("bookstore", "customers")
+
+## IMPORT TABLE TEST ##
+path = "sql_IO/"
+filename = "import_test.sql"
+sqlhandlerTest.importTable(path+filename, "bookstore")
+
 
 print ('\nexiting')
