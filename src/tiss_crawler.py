@@ -65,7 +65,7 @@ sqlhandlerTest.createTable("bookstore", tableName, columnInfo)
 
 ## IMPORT TABLE TEST ##
 path = "sql_IO/"
-filename = "import_test.sql"
+filename = "books(3).sql"
 sqlhandlerTest.importTable(path+filename, "bookstore")
 
 

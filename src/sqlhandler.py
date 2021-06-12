@@ -248,24 +248,104 @@ class sqlhandler:
 						line = fp.readline()
 						#insertData = ", ".join(self.extractInsertInformation(line))
 						t = self.extractInsertInformation(line)
+						
+						#print("")
+						
 						insertData = tuple(t)
+						#print("t: ", t)
+
+						# TODO: if 'COMMIT;' is never found this while loop never exits
 
 						if line.find('COMMIT;') != 0:
+							#print(importDB, ", ", insertStatement, ", ", insertData)
+							#print(line[:-2])
+							#pass
 							self.insertIntoTable(importDB, insertStatement, insertData)
 						else:
 							break
 
+	def determineEndpoint(self, processStr):
+		#print("> processStr ->", processStr, "<-", sep = "")
+		# first element is a number 	->	(805210407, 'The Trial', 1, 0, '1995', 'None'),
+		if processStr == "'":
+			searchType = "string"
+			endString = "'"
+		# first element is a string 	->	('0553213695', 'aa\'`\'\"aa', 1, 0, '1995', 'None'),
+		else:
+			searchType = "number"
+			endString = ','
+
+		return searchType, endString
+
+
 	# used by 'importTable': to extract the insert statements:
 	# "('66.249.75.177', '2000-02-01 00:46:30')," yields: ('66.249.75.177', '2000-02-01 00:46:30')
 	def extractInsertInformation(self, insertLine):
-		insertLine = insertLine.replace(", '", "")
+		#insertLine = insertLine.replace(", '", "")
 		#insertLine = insertLine.replace(" ", "").replace(",'", "")
 
 		# cut the string between the round brackets
-		strCutStart = insertLine.find("(")
-		strCutEnd = insertLine.find(")")
+		#strCutStart = insertLine.find("(")
+		#strCutEnd = insertLine.find(")")
 
-		return insertLine[strCutStart+2:strCutEnd-1].split("'")
+		#returnString = insertLine.strip()
+
+		#print(returnString[1:-2])
+
+		returnString = []
+
+		processStr = insertLine[1:-3]
+
+		#print("\n\n\n PROCESS STR: >>", processStr, "<<", sep = "")
+
+		searchType, endString = self.determineEndpoint(processStr[0])
+
+		tempStr = ""
+
+		#(553213695, 'aa\",\'`\'\",  \'  ,aa', 1, 0, '1995', 'None'),
+
+		#(123, 'abc', 123, '195', 'abc'),
+
+		i = 0
+
+		while i < len(processStr):
+			#print(" check[", i, "]" , processStr[i], endString, "> ")
+			if processStr[i] != endString:
+				tempStr += processStr[i]
+			else:
+				if (endString == "'" and processStr[i-1] != "\\") or endString == ',':
+					#print("append||", tempStr, "||", sep = "")
+					
+					returnString.append(tempStr)
+					tempStr = ""
+
+					#print ("IIII: ", i, " LEN: ", len(processStr))
+					if i+1 >= len(processStr):
+						break
+
+					if endString == ',':
+						i += 1	# set position to the next element
+					if endString == "'":
+						i += 2	# set position to the next element
+
+					# search the next entry level point
+					while processStr[i] == " ":
+						#print("skip: ", i)
+						i += 1
+
+					# determine next type (endpoints)
+					searchType, endString = self.determineEndpoint(processStr[i])
+					#print(" NEW ENDSTRING |", endString, "|", i, "|", processStr[i], sep = "")
+
+					if endString == ",":
+						tempStr += processStr[i]
+
+			i += 1
+
+		#print()
+		#print(" >>", returnString, "<< ", len(returnString))
+
+		return returnString
 
 	# used by 'importTable': extract table name and table columns from the insert string, e.g., given by
 	# 'INSERT INTO `2013__2013_02_28_23_55_21` (`IP`, `Date`) VALUES'. This function would retrieve
