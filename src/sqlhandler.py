@@ -112,6 +112,14 @@ class sqlhandler:
 		cursor.execute(sql) 
 		connection.close()
 
+	# clear(truncate) a table
+	def truncateTable(self, sqlSelectDatabase, deleteTableName):
+		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+		cursor = connection.cursor()
+		sql = "TRUNCATE TABLE " + deleteTableName
+		cursor.execute(sql) 
+		connection.close()
+
 	# export a table (into a file on the disk). This file can for example be used in phpMyadmin to import the table
 	# appendOnly == 1 ... don't write 'CREATE TABLE ...' into the file (only add data to an _existing_ table in the DB)
 	def exportTable(self, path, appendOnly, exportDB, exportTable):
@@ -362,12 +370,4 @@ class sqlhandler:
 		returnColumns = insertLine[strCutStart+2:strCutEnd-1].replace(", `", "").split('`')
 
 		return returnTableName, returnColumns
-
-
-
-
-
-
-
-
 

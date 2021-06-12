@@ -63,6 +63,11 @@ sqlhandlerTest.createTable("bookstore", tableName, columnInfo)
 ## DELETE TABLE TEST ##
 #sqlhandlerTest.dropTable("bookstore", "customers")
 
+
+## TRUNCATE TABLE TEST ##
+sqlhandlerTest.truncateTable("bookstore", "books")
+
+
 ## IMPORT TABLE TEST ##
 path = "sql_IO/"
 filename = "books(3).sql"
