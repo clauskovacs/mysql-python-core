@@ -1,4 +1,4 @@
-name: tiss-crawler
+name: tiss-crawler CI
 on:
   push:
     branches:
