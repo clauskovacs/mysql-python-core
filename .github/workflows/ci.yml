@@ -1,4 +1,4 @@
-name: Github Actions CI Test
+name: tiss-crawler
 on:
   push:
     branches:

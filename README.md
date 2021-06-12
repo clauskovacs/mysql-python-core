@@ -1,3 +1,5 @@
+![](https://github.com/clauskovacs/tiss-crawler/workflows/tiss-crawler CI/badge.svg)
+
 # tiss-crawler
 TISS (TU Wien Informations-Systeme & Services) Crawler 
 
