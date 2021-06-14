@@ -2,17 +2,17 @@
 #!/usr/bin/python3
 
 import mysql.connector as database
-import importlib.machinery
-loginCredentials = importlib.machinery.SourceFileLoader('login_credentials','conf/login_credentials.py').load_module()	# load sql login credentials from an external file
+#import importlib.machinery
+#loginCredentials = importlib.machinery.SourceFileLoader('login_credentials','conf/login_credentials.py').load_module()	# load sql login credentials from an external file
 
 class sqlhandler:
 	def __init__(self):
 		print ('creating sqlhandler class object (init)\n')
 
 		# set the login credentials
-		self.sqlLoginUser = loginCredentials.loginData["user"]
-		self.sqlLoginPassword = loginCredentials.loginData["password"]
-		self.sqlLoginHost = loginCredentials.loginData["host"]
+		self.sqlLoginUser		= "root"		#loginCredentials.loginData["user"]
+		self.sqlLoginPassword	= "12345"		#loginCredentials.loginData["password"]
+		self.sqlLoginHost		= "localhost"	#loginCredentials.loginData["host"]
 
 	# retrieve / list all existing databases
 	def fetchAllDB(self, verbose):
@@ -274,7 +274,7 @@ class sqlhandler:
 						colType = []
 						for var in colTypesReturn:
 							colType.append(var[1])
-						print("COLS: ", colType)
+						#print("COLS: ", colType)
 
 						insertData = self.extractInsertInformation(line, colType)
 						#print(" extracted insertdata: ", insertData, "\n\n")
