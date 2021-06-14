@@ -48,6 +48,8 @@ class sqlhandler:
 
 		return queryAllTables
 
+	# TODO: change this function so it can only fetch a certain amount of data as well as
+	#		only retrieve the column types ("SHOW COLUMNS ...")
 	# fetch data from a given table
 	def fetchTableContent(self, sqlSelectDatabase, sqlSelectTable, verbose):
 		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
@@ -211,6 +213,7 @@ class sqlhandler:
 			while line:
 				#print("{}".format(line.strip()))
 				line = fp.readline()
+				# TODO: IGNORE COMMENTS (lines starting with "/*" or "---"
 
 				# 'CREATE TABLE' block
 				if line.find('CREATE TABLE') != -1:
@@ -236,6 +239,9 @@ class sqlhandler:
 					tableName, returnColumns = self.extractTableHeaders(line)
 					#print("return table name: ", tableName, "  |  ", returnColumns)
 
+					# extract column information for the creation of the table
+					tableArgs = []
+
 					# create the insert data
 					insertColsJoined = ", ".join(returnColumns)
 
@@ -250,22 +256,43 @@ class sqlhandler:
 					)
 
 					# go through each insert line of the read file
-					while line.find('COMMIT;') == -1:
-						#print("> {}".format(line.strip()))
+					#print("   ||>   LINE: ", line)
+
+					# continue until the last line is reached (marked by the trailing semicolon)
+					while line.strip()[-1] != ";":
+
+						line = fp.readline()	# read the next line
+
+						#print(line.strip()[-1], "<<<<<<<<<<")
+						#print("     >> {}".format(line.strip()))
 						tableArgs.append(line.strip())
-						line = fp.readline()
 						#insertData = ", ".join(self.extractInsertInformation(line))
-						insertData = self.extractInsertInformation(line)
 
-						# TODO: if 'COMMIT;' is never found this while loop never exits
+						# extract column types (if int -> conversion in the extracted data must be performed
+						# to ensure a string is in the tuple which is bein inserted into the db (stored in insertData
+						dummyVar, colTypesReturn = self.fetchTableContent(importDB, tableName, 0)
+						colType = []
+						for var in colTypesReturn:
+							colType.append(var[1])
+						print("COLS: ", colType)
 
-						if line.find('COMMIT;') != 0:
-							#print(importDB, ", ", insertStatement, ", ", insertData)
+						insertData = self.extractInsertInformation(line, colType)
+						#print(" extracted insertdata: ", insertData, "\n\n")
+
+						#print("II: ", importDB, ", ", insertStatement, ", ", insertData)
+						#print(insertData, type(insertData))
+
+						#INSERT INTO books (isbn, title, author_id, publisher_id, year_pub, description) VALUES (%s, %s, %s, %s, %s, %s) ,  ('0553213695', 'The Metamorphosis', '1', 'None', '1991', 'None')
+
+
+						#if line.find('COMMIT;') != 0:
+							#print("II: ", importDB, ", ", insertStatement, ", ", insertData)
 							#print(line[:-2])
 							#pass
-							self.insertIntoTable(importDB, insertStatement, insertData)
-						else:
-							break
+						self.insertIntoTable(importDB, insertStatement, insertData)
+						#else:
+							#break
+
 
 	def determineEndpoint(self, processStr):
 		#print("> processStr ->", processStr, "<-", sep = "")
@@ -280,14 +307,13 @@ class sqlhandler:
 
 		return searchType, endString
 
-
 	# used by 'importTable': to extract the insert statements:
 	#########################################################################
 	# TODO: o) fix/check escaped characters, e.g.: aa\",\'`\'\",  \'  ,aa   #
 	#		o) consider all edge cases, e.g.: "(1, 2, 3, 4, 5, 6),"			#
 	#		o) SQL-terminal dump: "mysqldump -u root -p bookstore > dump.sql"
 	#########################################################################
-	def extractInsertInformation(self, insertLine):
+	def extractInsertInformation(self, insertLine, colTypes):
 		#insertLine = insertLine.replace(", '", "")
 		#insertLine = insertLine.replace(" ", "").replace(",'", "")
 
@@ -313,6 +339,7 @@ class sqlhandler:
 			tempStr = processStr[0]
 
 		i = 0
+		insertPosition = 0
 
 		while i < len(processStr):
 			i += 1
@@ -326,8 +353,17 @@ class sqlhandler:
 					#print("  >end found: ", i)
 					#print("  append1||", tempStr, "||", sep = "")
 
+					# if the read string is 'none' it must be converted to an int in case of the table
+					# expecting and int as datatype in the DB (else an error is thrown)
+					if colTypes[insertPosition].find("int") == 0:
+						if tempStr == 'None':
+							tempStr = None
+						else:
+							tempStr = int(tempStr)
+
 					returnString.append(tempStr)
 					tempStr = ""
+					insertPosition += 1
 
 					#print ("IIII: ", i, " LEN: ", len(processStr))
 					if i+1 >= len(processStr):
@@ -349,7 +385,6 @@ class sqlhandler:
 
 					if endString == ",":
 						tempStr += processStr[i]
-
 
 		#print()
 		#print(" >>", returnString, "<< ", len(returnString))

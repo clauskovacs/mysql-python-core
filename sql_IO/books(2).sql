@@ -45,6 +45,7 @@ INSERT INTO `books` (`isbn`, `title`, `author_id`, `publisher_id`, `year_pub`, `
 (805210407, 'The Trial', 1, 0, '1995', 'None'),
 (805210644, 'America', 1, 0, '1995', 'None'),
 (805211063, 'The Castle', 1, 0, '1998', 'None');
+(1, 'The Castle', 1, 0, '1998', 'None');
 
 --
 -- Indexes for dumped tables

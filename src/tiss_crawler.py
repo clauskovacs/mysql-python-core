@@ -70,7 +70,13 @@ sqlhandlerTest.truncateTable("bookstore", "books")
 
 ## IMPORT TABLE TEST ##
 path = "sql_IO/"
-filename = "books(3).sql"
+filename = "sql_export_test.sql"
 sqlhandlerTest.importTable(path+filename, "bookstore")
+
+
+
+
+
+
 
 print ('\nexiting')
