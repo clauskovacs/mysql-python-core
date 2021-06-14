@@ -41,8 +41,8 @@ CREATE TABLE `books` (
 --
 
 INSERT INTO `books` (`isbn`, `title`, `author_id`, `publisher_id`, `year_pub`, `description`) VALUES
-(553213695, 'aa\",\'`\'\",  \'  ,aa', 1, 0, '1995', 'None'),
-(805210407, 'The Trial', 1, 0, '1995', 'None'),
-(805210644, 'America', 1, 0, '1995', 'None'),
+(0523, 'aa\",\'`\'\",  \'  ,aa', 1, 0, '1995', 'None'),
+(1523, 'aa\",\'`\'\",  \'  ,aa', 1, 0, '1995', 'None'),
+(2523, 'aa\",\'`\'\",  \'  ,aa', 1, 0, '1995', 'None'),
+(3523, 'aa\",\'`\'\",  \'  ,aa', 1, 0, '1995', 'None'),
 COMMIT;
-

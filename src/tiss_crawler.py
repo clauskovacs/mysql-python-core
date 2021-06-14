@@ -73,5 +73,4 @@ path = "sql_IO/"
 filename = "books(3).sql"
 sqlhandlerTest.importTable(path+filename, "bookstore")
 
-
 print ('\nexiting')

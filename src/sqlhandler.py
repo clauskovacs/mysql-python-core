@@ -205,7 +205,7 @@ class sqlhandler:
 	# import a table from an external file on the disk into the sql DB system
 	def importTable(self, path, importDB):
 		# open the file; parse it line, by line
-		with open(path) as fp:
+		with open(path, encoding='utf-8') as fp:
 			line = fp.readline()
 
 			while line:
@@ -255,12 +255,7 @@ class sqlhandler:
 						tableArgs.append(line.strip())
 						line = fp.readline()
 						#insertData = ", ".join(self.extractInsertInformation(line))
-						t = self.extractInsertInformation(line)
-						
-						#print("")
-						
-						insertData = tuple(t)
-						#print("t: ", t)
+						insertData = self.extractInsertInformation(line)
 
 						# TODO: if 'COMMIT;' is never found this while loop never exits
 
@@ -287,7 +282,11 @@ class sqlhandler:
 
 
 	# used by 'importTable': to extract the insert statements:
-	# "('66.249.75.177', '2000-02-01 00:46:30')," yields: ('66.249.75.177', '2000-02-01 00:46:30')
+	#########################################################################
+	# TODO: o) fix/check escaped characters, e.g.: aa\",\'`\'\",  \'  ,aa   #
+	#		o) consider all edge cases, e.g.: "(1, 2, 3, 4, 5, 6),"			#
+	#		o) SQL-terminal dump: "mysqldump -u root -p bookstore > dump.sql"
+	#########################################################################
 	def extractInsertInformation(self, insertLine):
 		#insertLine = insertLine.replace(", '", "")
 		#insertLine = insertLine.replace(" ", "").replace(",'", "")
@@ -308,22 +307,25 @@ class sqlhandler:
 
 		searchType, endString = self.determineEndpoint(processStr[0])
 
-		tempStr = ""
-
-		#(553213695, 'aa\",\'`\'\",  \'  ,aa', 1, 0, '1995', 'None'),
-
-		#(123, 'abc', 123, '195', 'abc'),
+		if processStr[0] == "'":
+			tempStr = ""
+		else:
+			tempStr = processStr[0]
 
 		i = 0
 
 		while i < len(processStr):
-			#print(" check[", i, "]" , processStr[i], endString, "> ")
+			i += 1
+
+			#print(" check[", i, "] >" , processStr[i], "<>", endString, "< ", sep = "")
+			#print(i, sep = "")
 			if processStr[i] != endString:
 				tempStr += processStr[i]
 			else:
 				if (endString == "'" and processStr[i-1] != "\\") or endString == ',':
-					#print("append||", tempStr, "||", sep = "")
-					
+					#print("  >end found: ", i)
+					#print("  append1||", tempStr, "||", sep = "")
+
 					returnString.append(tempStr)
 					tempStr = ""
 
@@ -331,7 +333,7 @@ class sqlhandler:
 					if i+1 >= len(processStr):
 						break
 
-					if endString == ',':
+					if endString == ",":
 						i += 1	# set position to the next element
 					if endString == "'":
 						i += 2	# set position to the next element
@@ -348,12 +350,11 @@ class sqlhandler:
 					if endString == ",":
 						tempStr += processStr[i]
 
-			i += 1
 
 		#print()
 		#print(" >>", returnString, "<< ", len(returnString))
 
-		return returnString
+		return tuple(returnString)
 
 	# used by 'importTable': extract table name and table columns from the insert string, e.g., given by
 	# 'INSERT INTO `2013__2013_02_28_23_55_21` (`IP`, `Date`) VALUES'. This function would retrieve
