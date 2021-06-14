@@ -54,8 +54,8 @@ Program to crawl TISS (TU Wien Informations-Systeme & Services) and extract data
 ### Python installs
 `pip list | grep -F mysql`
 
-> mysql-connector               2.2.9
-> mysql-connector-python        8.0.25
+> mysql-connector               2.2.9  
+> mysql-connector-python        8.0.25  
 > mysqlclient                   1.3.13
 
 ## Running the Crawler

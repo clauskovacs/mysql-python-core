@@ -11,72 +11,70 @@ import sqlhandler
 #driver_instance.close_driver(driver)
 
 ## sql handler testing ##
-sqlhandlerTest = sqlhandler.sqlhandler()
+sqlhandler_testobj = sqlhandler.SqlHandler()
 
-"""
+
 ## fetch all existing DB ##
 print('\nfetching all existing DB:')
-returnAllDB = sqlhandlerTest.fetchAllDB(1)
+returnAllDB = sqlhandler_testobj.fetch_all_db(1)
 
 print('\n')
 
 ## fetch all tables from a DB ##
 selectDB = returnAllDB[0]['Database']
 print ('fetching all tables for DB: ' + selectDB)
-listStructureDB = sqlhandlerTest.fetchAllTablesfromDB(selectDB, 1)
+listStructureDB = sqlhandler_testobj.fetch_all_tables(selectDB, 1)
 
 print('\n')
 
 selectTable = listStructureDB[0]['Tables_in_' + selectDB]
-sqlhandlerTest.fetchTableContent(selectDB, selectTable, 1)
+print("select table: ", selectTable)
+sqlhandler_testobj.fetch_table_content(selectDB, selectTable, 1)
 
 print('\n')
-"""
+
 
 ## INSERT TEST ##
-"""
+selectTable = "2013__2013_02_28_23_55_21"
+
 insertStatement = (
-	"INSERT INTO " + selectTable +" (name_last, name_first, country) "
-	"VALUES (%s, %s, %s)"
+	"INSERT INTO " + selectTable +" (IP, Date) "
+	"VALUES (%s, %s)"
 )
-insertData = ('Jane', 'Doe', 'muh')
+insertData = ('168.172.0.0', '2000-0-0 00:00:00')
 
-sqlhandlerTest.insertIntoTable(selectDB, insertStatement, insertData)
-"""
+sqlhandler_testobj.insert_into_table(selectDB, insertStatement, insertData, 0)
 
 
-"""
+
+
 ## EXPORT TABLE TEST ##
 path = "sql_IO/"
 filename = "sql_export_test.sql"
-appendOnly = 1	# export with CREATE TABLE
-sqlhandlerTest.exportTable(path+filename, appendOnly, "bookstore", "books")
-"""
+appendOnly = 0	# export with CREATE TABLE
+sqlhandler_testobj.export_table(path+filename, appendOnly, "bookstore", "2013__2013_02_28_23_55_21")
 
-"""
+
+
 ## CREATE TABLE TEST ##
 columnInfo = "name VARCHAR(255), address VARCHAR(255)"
 tableName = "customers"
-sqlhandlerTest.createTable("bookstore", tableName, columnInfo)
-"""
+sqlhandler_testobj.create_table("bookstore", tableName, columnInfo)
+
 
 ## DELETE TABLE TEST ##
-#sqlhandlerTest.dropTable("bookstore", "customers")
+sqlhandler_testobj.drop_table("bookstore", "customers")
+
 
 
 ## TRUNCATE TABLE TEST ##
-sqlhandlerTest.truncateTable("bookstore", "books")
+sqlhandler_testobj.truncate_table("bookstore", "books")
 
 
 ## IMPORT TABLE TEST ##
 path = "sql_IO/"
-filename = "sql_export_test.sql"
-sqlhandlerTest.importTable(path+filename, "bookstore")
-
-
-
-
-
+filename = "import_test.sql"
+sqlhandler_testobj.import_table(path+filename, "bookstore")
 
 
 print ('\nexiting')

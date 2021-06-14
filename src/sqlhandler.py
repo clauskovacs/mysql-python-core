@@ -3,142 +3,173 @@
 
 import mysql.connector as database
 #import importlib.machinery
-#loginCredentials = importlib.machinery.SourceFileLoader('login_credentials','conf/login_credentials.py').load_module()	# load sql login credentials from an external file
+# load sql login credentials from an external file
+#loginCredentials = importlib.machinery.SourceFileLoader('login_credentials','conf/login_credentials.py').load_module()
 
-class sqlhandler:
+class SqlHandler:
 	def __init__(self):
 		print ('creating sqlhandler class object (init)\n')
 
 		# set the login credentials
-		self.sqlLoginUser		= "root"		#loginCredentials.loginData["user"]
-		self.sqlLoginPassword	= "12345"		#loginCredentials.loginData["password"]
-		self.sqlLoginHost		= "localhost"	#loginCredentials.loginData["host"]
+		self.sql_login_user		= "root"		#loginCredentials.loginData["user"]
+		self.sql_login_password	= "12345"		#loginCredentials.loginData["password"]
+		self.sql_login_host		= "localhost"	#loginCredentials.loginData["host"]
 
 	# retrieve / list all existing databases
-	def fetchAllDB(self, verbose):
-		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost)
+	def fetch_all_db(self, verbose):
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host)
 		cursor = connection.cursor(dictionary = True)
 
 		cursor.execute("SHOW DATABASES")
-		queryAllDB = cursor.fetchall()
+		return_all_db = cursor.fetchall()
 
 		connection.close()
 
 		# cout all found databases
 		if verbose == 1:
-			for row in queryAllDB:
+			for row in return_all_db:
 				print (row['Database'])
 
-		return queryAllDB
+		return return_all_db
 
 	# retrieve the tables from a DB
-	def fetchAllTablesfromDB(self, sqlSelectDatabase, verbose):
-		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+	def fetch_all_tables(self, select_database, verbose):
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
 		cursor = connection.cursor(dictionary = True)
 
 		cursor.execute("SHOW TABLES")
-		queryAllTables = cursor.fetchall()
+		return_all_tables = cursor.fetchall()
 
 		connection.close()
 
 		# cout the information
 		if verbose == 1:
-			for row in queryAllTables:
-				print (row['Tables_in_' + sqlSelectDatabase])
+			for row in return_all_tables:
+				print (row['Tables_in_' + select_database])
 
-		return queryAllTables
+		return return_all_tables
 
 	# TODO: change this function so it can only fetch a certain amount of data as well as
 	#		only retrieve the column types ("SHOW COLUMNS ...")
 	# fetch data from a given table
-	def fetchTableContent(self, sqlSelectDatabase, sqlSelectTable, verbose):
-		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+	def fetch_table_content(self, select_database, select_table, verbose):
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
 		cursor = connection.cursor()
 
 		# fetch/print the header (table column names)
-		cursor.execute("SHOW COLUMNS FROM " + sqlSelectTable)
-		fetchTableHeader = cursor.fetchall()
+		cursor.execute("SHOW COLUMNS FROM " + select_table)
+		return_table_header_data = cursor.fetchall()
 
 		if verbose == 1:
-			for row in fetchTableHeader:
+			for row in return_table_header_data:
 				print(f"{row[0]:>20} ", end = '')
-			print('\n-----------------------------------------------------------------------------------')
+			print('\n---------------------------------------------------')
 
 		# fetch/print the table column data
-		cursor.execute("SELECT * FROM " + sqlSelectTable)
-		fetchTableContentData = cursor.fetchall()
+		cursor.execute("SELECT * FROM " + select_table)
+		return_table_contents = cursor.fetchall()
 
 		connection.close()
 
 		# cout the table information
 		if verbose == 1:
-			for i in range(len(fetchTableContentData)):
-				print(fetchTableContentData[i])
-				#print(f"{str(fetchTableContentData[0][i]):>20} ", end = '')
+			for i in range(len(return_table_contents)):
+				print(return_table_contents[i])
+				#print(f"{str(return_table_contents[0][i]):>20} ", end = '')
 
-		return fetchTableContentData, fetchTableHeader
+		return return_table_contents, return_table_header_data
 
 	# insert data into a Table
-	def insertIntoTable(self, sqlSelectDatabase, insertStatement, insertData):
-		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+	def insert_into_table(self, select_database, insert_statement, insert_data, verbose):
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
 		cursor = connection.cursor()
-		cursor.execute(insertStatement, insertData)
+
+		if verbose == 1:
+			print("inserting into db: ", select_database,
+			": statement: ", insert_statement,
+			"; insertdata: ", insert_data)
+
+		cursor.execute(insert_statement, insert_data)
 		connection.commit()
 		connection.close()
 
-	# create a new table
-	def createTable(self, sqlSelectDatabase, tableName, columnInfo):
-		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+	# create a new table (with the columns as given by column_info)
+	def create_table(self, select_database, table_name, column_info):
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
 		cursor = connection.cursor()
 
-		# check, whether the table already exists
-		getAllTables = self.fetchAllTablesfromDB(sqlSelectDatabase, 0)
-		tableFound = False
+		# check, whether the table already exists in the DB
+		all_tables = self.fetch_all_tables(select_database, 0)
+		table_exists = False
 
-		for i in getAllTables:
-			if i['Tables_in_'+sqlSelectDatabase] == tableName:
-				print('table', tableName, "already exists in the DB")
-				tableFound = True
+		for i in all_tables:
+			if i['Tables_in_'+select_database] == table_name:
+				print('table', table_name, "already exists in the DB")
+				table_exists = True
 				break
 
-		if tableFound == False:
-			cursor.execute("CREATE TABLE " + tableName + " (" + columnInfo + ")")
+		if table_exists == False:
+			cursor.execute("CREATE TABLE " + table_name + " (" + column_info + ")")
 
 		connection.close()
 
 	# delete a table
-	def dropTable(self, sqlSelectDatabase, deleteTableName):
-		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+	def drop_table(self, select_database, delete_table):
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
 		cursor = connection.cursor()
-		sql = "DROP TABLE " + deleteTableName
+		sql = "DROP TABLE " + delete_table
 		cursor.execute(sql) 
 		connection.close()
 
 	# clear(truncate) a table
-	def truncateTable(self, sqlSelectDatabase, deleteTableName):
-		connection = database.connect(user = self.sqlLoginUser, password = self.sqlLoginPassword, host = self.sqlLoginHost, database = sqlSelectDatabase)
+	def truncate_table(self, select_database, truncate_table):
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
 		cursor = connection.cursor()
-		sql = "TRUNCATE TABLE " + deleteTableName
+		sql = "TRUNCATE TABLE " + truncate_table
 		cursor.execute(sql) 
 		connection.close()
 
 	# export a table (into a file on the disk). This file can for example be used in phpMyadmin to import the table
-	# appendOnly == 1 ... don't write 'CREATE TABLE ...' into the file (only add data to an _existing_ table in the DB)
-	def exportTable(self, path, appendOnly, exportDB, exportTable):
-		# write the header to the file
-		f = open(path, "w")
-		f.write('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";\n')
-		f.write('START TRANSACTION;\n')
-		f.write('SET time_zone = "+00:00";\n\n')
+	# append_only == 1 ... don't write 'CREATE TABLE ...' into the file (only add data to an _existing_ table in the DB)
+	def export_table(self, path, append_only, export_db, export_table):
+		# write header information
+		file_export_table = open(path, "w")
+		file_export_table.write('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";\n')
+		file_export_table.write('START TRANSACTION;\n')
+		file_export_table.write('SET time_zone = "+00:00";\n\n')
 
 		# fetch the data
-		tableData, tableHeaderData = self.fetchTableContent(exportDB, exportTable, 0)
+		read_table_data, read_table_header = self.fetch_table_content(export_db, export_table, 0)
 
-		if appendOnly == 0:
-			f.write('CREATE TABLE `' + exportTable + '` (\n')
-
-			# create a list to be able to change the entries
-			tableHeaderDataList = list(tableHeaderData)
+		if append_only == 0:
+			file_export_table.write('CREATE TABLE `' + export_table + '` (\n')
 
 			# replacements to make it compatible using, e.g., phpMyadmin
 			replacements = {
@@ -149,14 +180,14 @@ class sqlhandler:
 			}
 
 			# iterate over the list (create and write the data to the file)
-			for i in tableHeaderDataList:
+			for i in read_table_header:
 				# don't end the last line with a comma
-				if i != tableHeaderDataList[-1]:
+				if i != read_table_header[-1]:
 					endStr = ','
 				else:
 					endStr = ''
 
-				# replace certain elements in the list
+				# replace certain elements in the list (according to 'replacements')
 				i = [replacements.get(x, x) for x in i]
 
 				# remove all elements containing 'None' (in the table header)
@@ -164,50 +195,51 @@ class sqlhandler:
 
 				# create the string
 				full_str = ' '.join([str(elem) for elem in res])
-				f.write(full_str + endStr + "\n")
+				file_export_table.write(full_str + endStr + "\n")
 
-			f.write(") ENGINE=InnoDB DEFAULT CHARSET=latin1;\n\n")
+			file_export_table.write(") ENGINE=InnoDB DEFAULT CHARSET=latin1;\n\n")
 
 		# create/write the data
 		#
-		# header:
-		f.write('INSERT INTO `' + exportTable + '` ')
+		# HEADER:
+		file_export_table.write('INSERT INTO `' + export_table + '` ')
 
 		tmpStr1 = "("
 
-		for j in tableHeaderData:
-			tmpStr1 += '`' + j[0] + '`, '
+		for add_header_cols in read_table_header:
+			tmpStr1 += '`' + add_header_cols[0] + '`, '
 
 		# change the ending of the string
 		tmpStr1 = tmpStr1[:-2] + ")"
-		f.write(tmpStr1 + " VALUES \n")
 
-		# data:
-		for count, i in enumerate(tableData):
-			tmpStr2 = "("
+		file_export_table.write(tmpStr1 + " VALUES \n")
+
+		# DATA (loop through the 'data block'):
+		for count, i in enumerate(read_table_data):
+			temp_str_data = "("
 
 			for k in i:
 				if type(k) == int:
-					tmpStr2 += "" + str(k) + ", "
+					temp_str_data += "" + str(k) + ", "
 				else:
-					tmpStr2 += "'" + str(k) + "', "
+					temp_str_data += "'" + str(k) + "', "
 
 			# change the ending of the string
-			tmpStr2 = tmpStr2[:-2] + ")"
+			temp_str_data = temp_str_data[:-2] + ")"
 
-			if count == len(tableData)-1:
-				f.write(tmpStr2 + ";\n")
+			if count == len(read_table_data)-1:
+				file_export_table.write(temp_str_data + ";\n")
 			else:
-				f.write(tmpStr2 + ",\n")
+				file_export_table.write(temp_str_data + ",\n")
 
-		f.write("\nCOMMIT;")
+		file_export_table.write("\nCOMMIT;")
 
-		f.close()
+		file_export_table.close()
 
 	# import a table from an external file on the disk into the sql DB system
-	def importTable(self, path, importDB):
+	def import_table(self, path, import_target_db):
 		# open the file; parse it line, by line
-		with open(path, encoding='utf-8') as fp:
+		with open(path, encoding = 'utf-8') as fp:
 			line = fp.readline()
 
 			while line:
@@ -218,29 +250,24 @@ class sqlhandler:
 				# 'CREATE TABLE' block
 				if line.find('CREATE TABLE') != -1:
 					createTableName = line.split()[2].replace('`', '')
-					#print("{}".format(line.strip()))
 					line = fp.readline()
 
 					# extract column information for the creation of the table
-					tableArgs = []
+					# e.g.: "`IP` text NOT NULL,`Date` datetime NOT NULL"
+					create_table_col_info = []
 
 					while line.find(';') == -1:
-						#print("> {}".format(line.strip()))
-						tableArgs.append(line.strip())
+						create_table_col_info.append(line.strip())
 						line = fp.readline()
 
-					createArgs = ''.join(tableArgs)
-					
+					createArgs = ''.join(create_table_col_info)
+
 					# create the table
-					self.createTable(importDB, createTableName, createArgs)
+					self.create_table(import_target_db, createTableName, createArgs)
 
 				# 'INSERT INTO' block
 				if line.find('INSERT INTO') != -1:
-					tableName, returnColumns = self.extractTableHeaders(line)
-					#print("return table name: ", tableName, "  |  ", returnColumns)
-
-					# extract column information for the creation of the table
-					tableArgs = []
+					import_table_name, returnColumns = self.extract_table_headers(line)
 
 					# create the insert data
 					insertColsJoined = ", ".join(returnColumns)
@@ -251,159 +278,126 @@ class sqlhandler:
 					placeholder = ", ".join(placeholder)
 
 					insertStatement = (
-						"INSERT INTO " + tableName +" (" + insertColsJoined + ") "
+						"INSERT INTO " + import_table_name + " (" + insertColsJoined + ") "
 						"VALUES (" + placeholder + ")"
 					)
-
-					# go through each insert line of the read file
-					#print("   ||>   LINE: ", line)
 
 					# continue until the last line is reached (marked by the trailing semicolon)
 					while line.strip()[-1] != ";":
 
 						line = fp.readline()	# read the next line
 
-						#print(line.strip()[-1], "<<<<<<<<<<")
-						#print("     >> {}".format(line.strip()))
-						tableArgs.append(line.strip())
-						#insertData = ", ".join(self.extractInsertInformation(line))
-
 						# extract column types (if int -> conversion in the extracted data must be performed
 						# to ensure a string is in the tuple which is bein inserted into the db (stored in insertData
-						dummyVar, colTypesReturn = self.fetchTableContent(importDB, tableName, 0)
-						colType = []
+						dummyVar, colTypesReturn = self.fetch_table_content(import_target_db, import_table_name, 0)
+						column_type = [] # type of columns, e.g., text, datetime, int, etc.
 						for var in colTypesReturn:
-							colType.append(var[1])
-						#print("COLS: ", colType)
+							column_type.append(var[1])
 
-						insertData = self.extractInsertInformation(line, colType)
-						#print(" extracted insertdata: ", insertData, "\n\n")
+						insertData = self.extractInsertInformation(line, column_type)
 
-						#print("II: ", importDB, ", ", insertStatement, ", ", insertData)
-						#print(insertData, type(insertData))
+						self.insert_into_table(import_target_db, insertStatement, insertData, 0)
 
-						#INSERT INTO books (isbn, title, author_id, publisher_id, year_pub, description) VALUES (%s, %s, %s, %s, %s, %s) ,  ('0553213695', 'The Metamorphosis', '1', 'None', '1991', 'None')
-
-
-						#if line.find('COMMIT;') != 0:
-							#print("II: ", importDB, ", ", insertStatement, ", ", insertData)
-							#print(line[:-2])
-							#pass
-						self.insertIntoTable(importDB, insertStatement, insertData)
-						#else:
-							#break
-
-
-	def determineEndpoint(self, processStr):
-		#print("> processStr ->", processStr, "<-", sep = "")
-		# first element is a number 	->	(805210407, 'The Trial', 1, 0, '1995', 'None'),
-		if processStr == "'":
-			searchType = "string"
-			endString = "'"
-		# first element is a string 	->	('0553213695', 'aa\'`\'\"aa', 1, 0, '1995', 'None'),
+	# used by 'extractInsertInformation' to extract data endpoints.
+	# See examples/additional information below
+	def determine_endpoint(self, process_str):
+		# first element is a string  -> ('0553213695', ...),
+		if process_str == "'":
+			end_str = "'"
+		# first element is, e.g., a number -> (805210407, ...),
 		else:
-			searchType = "number"
-			endString = ','
+			end_str = ','
 
-		return searchType, endString
+		return end_str
 
-	# used by 'importTable': to extract the insert statements:
-	#########################################################################
-	# TODO: o) fix/check escaped characters, e.g.: aa\",\'`\'\",  \'  ,aa   #
-	#		o) consider all edge cases, e.g.: "(1, 2, 3, 4, 5, 6),"			#
-	#		o) SQL-terminal dump: "mysqldump -u root -p bookstore > dump.sql"
-	#########################################################################
-	def extractInsertInformation(self, insertLine, colTypes):
-		#insertLine = insertLine.replace(", '", "")
-		#insertLine = insertLine.replace(" ", "").replace(",'", "")
+	# used by 'import_table': to extract the insert statements:
+	# column_type ... type of columns, e.g., text, datetime, int, etc.
+	# read_insert_line ... read line of the "INSERT INTO" block (the data to be
+	# inserted)
+	#################################################################################
+	# TODO: o)	fix/check escaped characters, e.g.: aa\",\'`\'\",  \'  ,aa   		#
+	#		o)	consider all edge cases, e.g.: "(1, 2, 3, 4, 5, 6),"				#
+	#		o)	SQL-terminal dump: "mysqldump -u root -p bookstore > dump.sql"		#
+	#		o)	determine type of dump (phpMyAdmin, MariaDB, etc.) since			#
+	#			the results look differently (whitespaces, line formatting, etc.	#
+	#################################################################################
+	def extractInsertInformation(self, read_insert_line, column_type):
+		return_extracted_data = []
 
-		# cut the string between the round brackets
-		#strCutStart = insertLine.find("(")
-		#strCutEnd = insertLine.find(")")
+		# remove the round brackets and the trailing comma from the string
+		read_insert_line = read_insert_line[1:-3]
 
-		#returnString = insertLine.strip()
+		# determine the endpoint for the first element
+		end_str = self.determine_endpoint(read_insert_line[0])
 
-		#print(returnString[1:-2])
-
-		returnString = []
-
-		processStr = insertLine[1:-3]
-
-		#print("\n\n\n PROCESS STR: >>", processStr, "<<", sep = "")
-
-		searchType, endString = self.determineEndpoint(processStr[0])
-
-		if processStr[0] == "'":
-			tempStr = ""
+		# parse the element (push characters into 'temp_str' and append
+		# this string to the list which is returned from this function
+		if read_insert_line[0] == "'":
+			temp_str = ""
 		else:
-			tempStr = processStr[0]
+			temp_str = read_insert_line[0]
 
 		i = 0
 		insertPosition = 0
 
-		while i < len(processStr):
+		while i < len(read_insert_line):
 			i += 1
 
-			#print(" check[", i, "] >" , processStr[i], "<>", endString, "< ", sep = "")
-			#print(i, sep = "")
-			if processStr[i] != endString:
-				tempStr += processStr[i]
+			if read_insert_line[i] != end_str:
+				temp_str += read_insert_line[i]
 			else:
-				if (endString == "'" and processStr[i-1] != "\\") or endString == ',':
-					#print("  >end found: ", i)
-					#print("  append1||", tempStr, "||", sep = "")
-
+				if (end_str == "'" and read_insert_line[i-1] != "\\") or end_str == ',':
 					# if the read string is 'none' it must be converted to an int in case of the table
 					# expecting and int as datatype in the DB (else an error is thrown)
-					if colTypes[insertPosition].find("int") == 0:
-						if tempStr == 'None':
-							tempStr = None
+					if column_type[insertPosition].find("int") == 0:
+						if temp_str == 'None':
+							temp_str = None
 						else:
-							tempStr = int(tempStr)
+							temp_str = int(temp_str)
 
-					returnString.append(tempStr)
-					tempStr = ""
+					return_extracted_data.append(temp_str)
+					temp_str = ""
 					insertPosition += 1
 
-					#print ("IIII: ", i, " LEN: ", len(processStr))
-					if i+1 >= len(processStr):
+					if i+1 >= len(read_insert_line):
 						break
 
-					if endString == ",":
-						i += 1	# set position to the next element
-					if endString == "'":
-						i += 2	# set position to the next element
+					# set position to the next element to a whitespace. E.g.,
+					# 1) ('00.111.75.177', ...-> skip two to reach a whitespace
+					# 2) (0515153, ... -> skip one character reach a whitespace
+					#
+					# TODO: mysqldump does _not_ add whitespaces between elements:
+					# (12,'Jane','Doe','tzu'), and the whole insert statement is a
+					# single line (contrary to files generated using phpMyadmin)!
+					if end_str == ",":
+						i += 1
+					if end_str == "'":
+						i += 2
 
 					# search the next entry level point
-					while processStr[i] == " ":
-						#print("skip: ", i)
+					while read_insert_line[i] == " ":
 						i += 1
 
 					# determine next type (endpoints)
-					searchType, endString = self.determineEndpoint(processStr[i])
-					#print(" NEW ENDSTRING |", endString, "|", i, "|", processStr[i], sep = "")
+					end_str = self.determine_endpoint(read_insert_line[i])
 
-					if endString == ",":
-						tempStr += processStr[i]
+					if end_str == ",":
+						temp_str += read_insert_line[i]
 
-		#print()
-		#print(" >>", returnString, "<< ", len(returnString))
-
-		return tuple(returnString)
+		return tuple(return_extracted_data)
 
 	# used by 'importTable': extract table name and table columns from the insert string, e.g., given by
 	# 'INSERT INTO `2013__2013_02_28_23_55_21` (`IP`, `Date`) VALUES'. This function would retrieve
 	# '2013__2013_02_28_23_55_21' and  ['IP', 'Date'] in this case.
-	def extractTableHeaders(self, insertLine):
-		splitString = insertLine.split('`')
-		returnTableName = splitString[1]
+	def extract_table_headers(self, read_insert_line):
+		return_table_name = read_insert_line.split('`')[1]
 
-		# cut the string between the round brackets
-		strCutStart = insertLine.find("(")
-		strCutEnd = insertLine.find(")")
+		# cut the string between the round brackets (determine positions)
+		bracket_pos_cut_start = read_insert_line.find("(")
+		bracket_pos_cut_end = read_insert_line.find(")")
 
 		# extract the column names
-		returnColumns = insertLine[strCutStart+2:strCutEnd-1].replace(", `", "").split('`')
+		return_columns = read_insert_line[bracket_pos_cut_start+2:bracket_pos_cut_end-1].replace(", `", "").split('`')
 
-		return returnTableName, returnColumns
+		return return_table_name, return_columns
 
