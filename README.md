@@ -51,6 +51,15 @@ Program to crawl TISS (TU Wien Informations-Systeme & Services) and extract data
 > mariadb-connector-c-devel-3.1.7-1.fc30.x86_64  
 > mysql-connector-net-6.9.9-8.fc30.x86_64
 
+### Python installs
+`pip list | grep -F mysql`
+
+> mysql-connector               2.2.9
+> mysql-connector-python        8.0.25
+> mysqlclient                   1.3.13
+
+
+
 ## Running the Crawler
 Use the makefile to run the crawler.
 
