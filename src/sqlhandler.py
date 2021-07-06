@@ -315,7 +315,7 @@ class SqlHandler:
 	# read_insert_line ... read line of the "INSERT INTO" block (the data to be
 	# inserted)
 	#################################################################################
-	# TODO: o)	fix/check escaped characters, e.g.: aa\",\'`\'\",  \'  ,aa   		#
+	# TODO:	o)	fix/check escaped characters, e.g.: aa\",\'`\'\",  \'  ,aa   		#
 	#		o)	consider all edge cases, e.g.: "(1, 2, 3, 4, 5, 6),"				#
 	#		o)	SQL-terminal dump: "mysqldump -u root -p bookstore > dump.sql"		#
 	#		o)	determine type of dump (phpMyAdmin, MariaDB, etc.) since			#

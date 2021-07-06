@@ -4,7 +4,7 @@
 import unittest
 from src import sqlhandler
 
-class TestSum(unittest.TestCase):
+class SqlhandlerTest(unittest.TestCase):
 
 	# test the function extractInsertInformation of the sqlhandler. This function
 	# is part of the importfunction of a table to the DB. It parses a *.sql file
