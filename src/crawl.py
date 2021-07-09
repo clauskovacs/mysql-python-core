@@ -26,7 +26,7 @@ class crawler:
 		self.non_headless_width = non_headless_width		# width of the browser window (if run_headless == False)
 
 	def init_driver(self):
-		"""This function initiates the webdriver (as defined).
+		"""Initiate the webdriver (as defined by the user).
 
 		Using the provided options (headlessness, user agent, browser
 		window height and width, etc.), this function initiates the
@@ -63,14 +63,14 @@ class crawler:
 		return driver
 
 	def close_driver(self, driver):
-		'''This function closes the webdriver properly.'''
+		'''Close the webdriver properly.'''
 		print ('closing driver')
 
 		driver.close()	# close the current browser window
 		driver.quit()	# calls driver.dispose which closes all the browser windows and ends the webdriver session properly
 
 	def fetch_page(self, driver):
-		'''This function fetches a single website using webdriver'''
+		'''Fetches a single website using webdriver.'''
 		print ('fetching page')
 
 		# fetch the page (open the headless browser)

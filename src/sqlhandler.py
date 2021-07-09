@@ -7,7 +7,7 @@ import mysql.connector as database
 #loginCredentials = importlib.machinery.SourceFileLoader('login_credentials','conf/login_credentials.py').load_module()
 
 class SqlHandler:
-	"""This class handles access to the SQL server.
+	"""This class handles access to the SQL server (connection, data manipulation, etc.).
 
 	The SQL server can be a local one or a remote one. Various
 	different functions for setting up and initiating the
