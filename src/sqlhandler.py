@@ -7,7 +7,19 @@ import mysql.connector as database
 #loginCredentials = importlib.machinery.SourceFileLoader('login_credentials','conf/login_credentials.py').load_module()
 
 class SqlHandler:
+	"""This class handles access to the SQL server.
+
+	The SQL server can be a local one or a remote one. Various
+	different functions for setting up and initiating the
+	connection as well as access to the databases and tables
+	are provided in this class.
+	"""
 	def __init__(self):
+		"""Define the login credentials for accessing the database.
+
+		The credentials are the username, password and the host
+		where the SQL database(s) are located at.
+		"""
 		print ('creating sqlhandler class object (init)\n')
 
 		# set the login credentials
@@ -15,8 +27,13 @@ class SqlHandler:
 		self.sql_login_password	= "12345"		#loginCredentials.loginData["password"]
 		self.sql_login_host		= "localhost"	#loginCredentials.loginData["host"]
 
-	# retrieve / list all existing databases
 	def fetch_all_db(self, verbose):
+		"""Retrieve / list all existing databases.
+
+		For the given SQL server connection, this function
+		returns all databases present. The verbose option
+		prints the retrieved information to the terminal.
+		"""
 		connection = database.connect(
 			user = self.sql_login_user,
 			password = self.sql_login_password,
@@ -28,15 +45,20 @@ class SqlHandler:
 
 		connection.close()
 
-		# cout all found databases
+		# print all found databases (to the terminal)
 		if verbose == 1:
 			for row in return_all_db:
 				print (row['Database'])
 
 		return return_all_db
 
-	# retrieve the tables from a DB
 	def fetch_all_tables(self, select_database, verbose):
+		"""Retrieve all tables from a given DB on the SQL server.
+
+		For a given database, this function returns all tables
+		in this database on the SQL server. The verbose option
+		prints the retrieved information to the terminal.
+		"""
 		connection = database.connect(
 			user = self.sql_login_user,
 			password = self.sql_login_password,
@@ -49,17 +71,25 @@ class SqlHandler:
 
 		connection.close()
 
-		# cout the information
 		if verbose == 1:
 			for row in return_all_tables:
 				print (row['Tables_in_' + select_database])
 
 		return return_all_tables
 
-	# TODO: change this function so it can only fetch a certain amount of data as well as
-	#		only retrieve the column types ("SHOW COLUMNS ...")
-	# fetch data from a given table
 	def fetch_table_content(self, select_database, select_table, verbose):
+		"""Fetch data from a given table for a selected database and table.
+
+		For a given database and table on a SQL server, this
+		function returns all the containing informations
+		(e.g., row/column data, etc.). The verbose option
+		prints the retrieved information to the terminal.
+		"""
+
+		"""
+		TODO: change this function so it can only fetch a certain amount of data as well as
+		only retrieve the column types ("SHOW COLUMNS ...")
+		"""
 		connection = database.connect(
 			user = self.sql_login_user,
 			password = self.sql_login_password,
@@ -82,7 +112,6 @@ class SqlHandler:
 
 		connection.close()
 
-		# cout the table information
 		if verbose == 1:
 			for i in range(len(return_table_contents)):
 				print(return_table_contents[i])
@@ -90,8 +119,14 @@ class SqlHandler:
 
 		return return_table_contents, return_table_header_data
 
-	# insert data into a Table
 	def insert_into_table(self, select_database, insert_statement, insert_data, verbose):
+		"""Insert data into a table of a database.
+
+		This functions inserts data (insert_data) into a table
+		(defined in the insert statment: insert_data) of a
+		database (select_database). The verbose option
+		prints the retrieved information to the terminal.
+		"""
 		connection = database.connect(
 			user = self.sql_login_user,
 			password = self.sql_login_password,
@@ -108,8 +143,13 @@ class SqlHandler:
 		connection.commit()
 		connection.close()
 
-	# create a new table (with the columns as given by column_info)
 	def create_table(self, select_database, table_name, column_info):
+		"""Create a new table.
+
+		With the columns as given by column_info this function
+		creates a new table (table_name) in the given database
+		(select_database).
+		"""
 		connection = database.connect(
 			user = self.sql_login_user,
 			password = self.sql_login_password,
@@ -132,8 +172,8 @@ class SqlHandler:
 
 		connection.close()
 
-	# delete a table
 	def drop_table(self, select_database, delete_table):
+		'''This function deletes a table from a selected database.'''
 		connection = database.connect(
 			user = self.sql_login_user,
 			password = self.sql_login_password,
@@ -144,8 +184,14 @@ class SqlHandler:
 		cursor.execute(sql) 
 		connection.close()
 
-	# clear(truncate) a table
 	def truncate_table(self, select_database, truncate_table):
+		"""Clear (truncate) a table.
+
+		For a given table (truncate_table) in the database
+		(select_database), this function performes a
+		truncation, i.e., all information in the table is
+		cleared (truncated).
+		"""
 		connection = database.connect(
 			user = self.sql_login_user,
 			password = self.sql_login_password,
@@ -156,9 +202,20 @@ class SqlHandler:
 		cursor.execute(sql) 
 		connection.close()
 
-	# export a table (into a file on the disk). This file can for example be used in phpMyadmin to import the table
-	# append_only == 1 ... don't write 'CREATE TABLE ...' into the file (only add data to an _existing_ table in the DB)
 	def export_table(self, path, append_only, export_db, export_table):
+		"""Export a table from the SQL server to a (local) file on the disk.
+
+		Export a table (into a file on the disk).
+		This file can for example be used in phpMyadmin
+		to import the table into. The last two arguments
+		of this function define the database (export_db)
+		and table name (export_table) where the data is
+		located which should be exported to the disk. The
+		option append_only is used to append to an (external)
+		file on the disk. If this variable is set to False,
+		a header (CREATE TABLE ...) will be written to the file.
+		"""
+
 		# write header information
 		file_export_table = open(path, "w")
 		file_export_table.write('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";\n')
@@ -168,7 +225,7 @@ class SqlHandler:
 		# fetch the data
 		read_table_data, read_table_header = self.fetch_table_content(export_db, export_table, 0)
 
-		if append_only == 0:
+		if append_only == False:
 			file_export_table.write('CREATE TABLE `' + export_table + '` (\n')
 
 			# replacements to make it compatible using, e.g., phpMyadmin
@@ -236,8 +293,42 @@ class SqlHandler:
 
 		file_export_table.close()
 
-	# import a table from an external file on the disk into the sql DB system
 	def import_table(self, path, import_target_db):
+		"""Import a (local) file into the SQL server.
+
+		This function takes a path to a local SQL file as stated
+		by the variable 'path' and inserts it into the database
+		provided by the variable 'import_target_db'. This function
+		expects for example the following data structure:
+
+		------------------------------------------------------------
+		SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+		START TRANSACTION;
+		SET time_zone = "+00:00";
+
+		CREATE TABLE `2013__2013_02_28_23_55_21` (
+		IP text NOT NULL,
+		Date datetime NOT NULL
+		) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+		INSERT INTO `2013__2013_02_28_23_55_21` (`IP`, `Date`) VALUES 
+		('00.111.75.177', '2000-02-01 00:46:30'),
+		('66.249.78.123', '2013-02-01 01:14:59'),
+		('79.208.109.187', '2013-02-01 01:15:14'),
+		('66.249.78.177', '2013-02-01 01:27:57'),
+		('77.117.246.38', '2013-02-28 22:31:39'),
+		('89.999.179.155', '3121-02-28 23:53:19'),
+		('00.111.75.177', '2000-02-01 00:46:30'),
+		('66.249.78.123', '2013-02-01 01:14:59'),
+		('79.208.109.187', '2013-02-01 01:15:14'),
+		('66.249.78.177', '2013-02-01 01:27:57'),
+		.
+		.
+		.
+
+		COMMIT;
+		------------------------------------------------------------
+		"""
 		# open the file; parse it line, by line
 		with open(path, encoding = 'utf-8') as fp:
 			line = fp.readline()
@@ -298,9 +389,23 @@ class SqlHandler:
 
 						self.insert_into_table(import_target_db, insertStatement, insertData, 0)
 
-	# used by 'extractInsertInformation' to extract data endpoints.
-	# See examples/additional information below
 	def determine_endpoint(self, process_str):
+		"""Helper function used by extractInsertInformation() to extract data endpoints.
+
+		The function import_table() contains a call to the function
+		extractInsertInformation() which calls this function. The
+		purpose of this function is to determine the type of element
+		endpoints. The overall goal is to read data from the disk and
+		insert this into the SQL system. This read data may consist
+		of different kind. For example it may look like:
+		('0553213695', ...) in which the end of the element is defined
+		by a single quotation mark. If may look like:
+		(805210407, ...) in which case the end delimiter is a comma.
+		This endpoint (delimiter) is used to distinguish between
+		elements, i.e., it is used to determine where the next element
+		starts and the previous one ended.
+		"""
+
 		# first element is a string  -> ('0553213695', ...),
 		if process_str == "'":
 			end_str = "'"
@@ -322,6 +427,17 @@ class SqlHandler:
 	#			the results look differently (whitespaces, line formatting, etc.	#
 	#################################################################################
 	def extractInsertInformation(self, read_insert_line, column_type):
+		"""Used by the function import_table() to read disk data containing SQL info.
+
+		This function takes and processes a single line of the
+		read file on the disk containing the SQL statements, e.g.,
+		"('79.208.109.187', '2013-02-01 01:15:14'),". USing the
+		function determine_endpoint(), these lines are processed,
+		i.e., the data fields are extracted. This yields (in the
+		former stated example) a tuple containing:
+		['79.208.109.187', '2013-02-01 01:15:14']. This tuple is
+		then returned from this function.
+		"""
 		return_extracted_data = []
 
 		# remove the round brackets and the trailing comma from the string
@@ -386,10 +502,17 @@ class SqlHandler:
 
 		return tuple(return_extracted_data)
 
-	# used by 'importTable': extract table name and table columns from the insert string, e.g., given by
-	# 'INSERT INTO `2013__2013_02_28_23_55_21` (`IP`, `Date`) VALUES'. This function would retrieve
-	# '2013__2013_02_28_23_55_21' and  ['IP', 'Date'] in this case.
 	def extract_table_headers(self, read_insert_line):
+		"""Used by import_table() this function extracts info from the INSERT INTO line.
+
+		The external SQL files on the disk have a 'header' line
+		which may for example look like:
+		"INSERT INTO `2013__2013_02_28_23_55_21` (`IP`, `Date`) VALUES".
+		This function extracts the table name (2013__2013_02_28_23_55_21)
+		and the column names (['IP', 'Date']) in this example. This
+		information is stored and returned via the variables 'return_table_name'
+		and 'return_columns'.
+		"""
 		return_table_name = read_insert_line.split('`')[1]
 
 		# cut the string between the round brackets (determine positions)
@@ -400,4 +523,3 @@ class SqlHandler:
 		return_columns = read_insert_line[bracket_pos_cut_start+2:bracket_pos_cut_end-1].replace(", `", "").split('`')
 
 		return return_table_name, return_columns
-

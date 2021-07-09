@@ -22,4 +22,3 @@ jobs:
           pip install -r requirements.txt
       - name: Test with pytest
         run: python3 -m test.test_sqlhandler -vv
-

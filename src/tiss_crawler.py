@@ -4,11 +4,13 @@
 import crawl
 import sqlhandler
 
+"""
 # crawling events testing
-#driver_instance = crawl.crawler(True, 800, 600)
-#driver = driver_instance.init_driver()
-#driver_instance.fetch_page(driver)
-#driver_instance.close_driver(driver)
+driver_instance = crawl.crawler(True, 800, 600)
+driver = driver_instance.init_driver()
+driver_instance.fetch_page(driver)
+driver_instance.close_driver(driver)
+"""
 
 ## sql handler testing ##
 sqlhandler_testobj = sqlhandler.SqlHandler()
@@ -19,6 +21,7 @@ print('\nfetching all existing DB:')
 returnAllDB = sqlhandler_testobj.fetch_all_db(1)
 
 print('\n')
+
 
 ## fetch all tables from a DB ##
 selectDB = returnAllDB[0]['Database']
@@ -38,7 +41,7 @@ print('\n')
 selectTable = "2013__2013_02_28_23_55_21"
 
 insertStatement = (
-	"INSERT INTO " + selectTable +" (IP, Date) "
+	"INSERT INTO " + selectTable + " (IP, Date) "
 	"VALUES (%s, %s)"
 )
 insertData = ('168.172.0.0', '2000-0-0 00:00:00')
@@ -46,14 +49,11 @@ insertData = ('168.172.0.0', '2000-0-0 00:00:00')
 sqlhandler_testobj.insert_into_table(selectDB, insertStatement, insertData, 0)
 
 
-
-
 ## EXPORT TABLE TEST ##
 path = "sql_IO/"
 filename = "sql_export_test.sql"
-appendOnly = 0	# export with CREATE TABLE
+appendOnly = False	# don't append, i.e., always create a new file from scratch
 sqlhandler_testobj.export_table(path+filename, appendOnly, "bookstore", "2013__2013_02_28_23_55_21")
-
 
 
 ## CREATE TABLE TEST ##
@@ -64,7 +64,6 @@ sqlhandler_testobj.create_table("bookstore", tableName, columnInfo)
 
 ## DELETE TABLE TEST ##
 sqlhandler_testobj.drop_table("bookstore", "customers")
-
 
 
 ## TRUNCATE TABLE TEST ##
