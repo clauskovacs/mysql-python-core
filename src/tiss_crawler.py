@@ -4,14 +4,24 @@
 import crawl
 import sqlhandler
 
-"""
-# crawling events testing
-driver_instance = crawl.crawler(True, 800, 600)
-driver = driver_instance.init_driver()
-driver_instance.fetch_page(driver)
-driver_instance.close_driver(driver)
-"""
 
+# crawling events testing
+driver_instance = crawl.crawler(False, 800, 600, 2)
+driver = driver_instance.init_driver()
+
+#page_to_fetch = "https://webscraper.io/test-sites/e-commerce/allinone"
+page_to_fetch = "https://tiss.tuwien.ac.at/course/courseDetails.xhtml?dswid=5214&dsrid=967&courseNr=254037&semester=2021S"
+
+
+driver_instance.fetch_page(driver, page_to_fetch)
+driver_instance.close_driver(driver)
+
+
+
+
+
+
+"""
 ## sql handler testing ##
 sqlhandler_testobj = sqlhandler.SqlHandler()
 
@@ -74,6 +84,6 @@ sqlhandler_testobj.truncate_table("bookstore", "books")
 path = "sql_IO/"
 filename = "import_test.sql"
 sqlhandler_testobj.import_table(path+filename, "bookstore")
-
+"""
 
 print ('\nexiting')

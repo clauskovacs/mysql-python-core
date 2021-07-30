@@ -415,17 +415,6 @@ class SqlHandler:
 
 		return end_str
 
-	# used by 'import_table': to extract the insert statements:
-	# column_type ... type of columns, e.g., text, datetime, int, etc.
-	# read_insert_line ... read line of the "INSERT INTO" block (the data to be
-	# inserted)
-	#################################################################################
-	# TODO:	o)	fix/check escaped characters, e.g.: aa\",\'`\'\",  \'  ,aa   		#
-	#		o)	consider all edge cases, e.g.: "(1, 2, 3, 4, 5, 6),"				#
-	#		o)	SQL-terminal dump: "mysqldump -u root -p bookstore > dump.sql"		#
-	#		o)	determine type of dump (phpMyAdmin, MariaDB, etc.) since			#
-	#			the results look differently (whitespaces, line formatting, etc.	#
-	#################################################################################
 	def extractInsertInformation(self, read_insert_line, column_type):
 		"""Used by the function import_table() to read disk data containing SQL info.
 
@@ -438,6 +427,15 @@ class SqlHandler:
 		['79.208.109.187', '2013-02-01 01:15:14']. This tuple is
 		then returned from this function.
 		"""
+
+		#################################################################################
+		# TODO:	o)	fix/check escaped characters, e.g.: aa\",\'`\'\",  \'  ,aa   		#
+		#		o)	consider all edge cases, e.g.: "(1, 2, 3, 4, 5, 6),"				#
+		#		o)	SQL-terminal dump: "mysqldump -u root -p bookstore > dump.sql"		#
+		#		o)	determine type of dump (phpMyAdmin, MariaDB, etc.) since			#
+		#			the results look differently (whitespaces, line formatting, etc.	#
+		#################################################################################
+
 		return_extracted_data = []
 
 		# remove the round brackets and the trailing comma from the string
