@@ -8,7 +8,7 @@ from pathlib import Path
 # load sql login credentials from an external file
 my_file = Path("src/config.py")
 
-# default ones for the tests
+# default ones for the tests (github CI).
 dbLoginUser = ""
 dbLoginPassword = ""
 dbHostURL = ""
