@@ -3,8 +3,9 @@
 
 import crawl
 import sqlhandler
+from sys import exit
 
-
+"""
 # crawling events testing
 driver_instance = crawl.crawler(False, 800, 600, 2)
 driver = driver_instance.init_driver()
@@ -15,13 +16,13 @@ page_to_fetch = "https://tiss.tuwien.ac.at/course/courseDetails.xhtml?dswid=5214
 
 driver_instance.fetch_page(driver, page_to_fetch)
 driver_instance.close_driver(driver)
-
-
-
-
-
-
 """
+
+
+
+
+
+
 ## sql handler testing ##
 sqlhandler_testobj = sqlhandler.SqlHandler()
 
@@ -32,14 +33,16 @@ returnAllDB = sqlhandler_testobj.fetch_all_db(1)
 
 print('\n')
 
-
 ## fetch all tables from a DB ##
-selectDB = returnAllDB[0]['Database']
+selectDB = returnAllDB[1]['Database']
+
+print(selectDB)
+
 print ('fetching all tables for DB: ' + selectDB)
 listStructureDB = sqlhandler_testobj.fetch_all_tables(selectDB, 1)
 
 print('\n')
-
+"""
 selectTable = listStructureDB[0]['Tables_in_' + selectDB]
 print("select table: ", selectTable)
 sqlhandler_testobj.fetch_table_content(selectDB, selectTable, 1)

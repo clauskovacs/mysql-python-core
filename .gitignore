@@ -10,4 +10,4 @@ __pycache__/
 # build/
 
 # ignore (sql) config files
-conf/login_credentials.py
+src/config.py

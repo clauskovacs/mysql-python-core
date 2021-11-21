@@ -2,9 +2,7 @@
 #!/usr/bin/python3
 
 import mysql.connector as database
-#import importlib.machinery
-# load sql login credentials from an external file
-#loginCredentials = importlib.machinery.SourceFileLoader('login_credentials','conf/login_credentials.py').load_module()
+from config import *	# login credentials (username, password, hostURL)
 
 class SqlHandler:
 	"""This class handles access to the SQL server (connection, data manipulation, etc.).
@@ -23,9 +21,9 @@ class SqlHandler:
 		print ('creating sqlhandler class object (init)\n')
 
 		# set the login credentials
-		self.sql_login_user		= "root"		#loginCredentials.loginData["user"]
-		self.sql_login_password	= "12345"		#loginCredentials.loginData["password"]
-		self.sql_login_host		= "localhost"	#loginCredentials.loginData["host"]
+		self.sql_login_user		= dbLoginUser		#loginCredentials.loginData["user"]
+		self.sql_login_password	= dbLoginPassword	#loginCredentials.loginData["password"]
+		self.sql_login_host		= dbHostURL			#loginCredentials.loginData["host"]
 
 	def fetch_all_db(self, verbose):
 		"""Retrieve / list all existing databases.
