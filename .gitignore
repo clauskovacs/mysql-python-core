@@ -10,4 +10,4 @@ __pycache__/
 # build/
 
 # ignore (sql) config files
-config/config.py
+src/config.py
