@@ -1,63 +1,49 @@
 ![](https://github.com/clauskovacs/mysql-python-core/workflows/mysql-python-core/badge.svg)
 
-# tiss-crawler
-TISS (TU Wien Informations-Systeme & Services) Crawler 
+# mysql-python-core
+Building upon *mysql-python-connect-test* (https://github.com/clauskovacs/mysql-python-connect-test), this program implements some basic routines to interact with a database.
 
 ## Description
-Program to crawl TISS (TU Wien Informations-Systeme & Services) and extract data
+Utilizing the class **SqlHandler**, following database operations are provided:
+1. **fetch_all_db(...)** *(Retrieve / list all existing databases)*
+2. **fetch_all_tables(...)** *(Retrieve all tables from a given DB on the SQL server)*
+3. **fetch_table_content(...)** *(Fetch data from a given table for a selected database and table)*
+4. **insert_into_table(...)** *(Insert data into a table of a database.)*
+5. **create_table(...)** *(Create a new table)*
+6. **drop_table(...)** *(Delete a table from a selected database)*
+7. **truncate_table(...)** *(Clear (truncate) a table)*
+8. **export_table(...)** *(Export a table from the SQL server to a (local) file on the disk)*
+9. **import_table(...)** *(Import a (local) file into the SQL server)*
 
-## Dependencies / Installation (Fedora, 5.6.13-100.fc30.x86_64)
+Some of the functions are used in https://github.com/higgsAT/lecture-free-time-extract.
 
-### SQL
-**Installed repositories (not everyone may be necessary):**
+## Folder Structure
+This project has the following folder structure
+```
+.
+├── logs
+├── src
+    ├── config_example.py
+    └── sqlhandler.py
+└── test
+    ├── sqlhandler_testtable_import.sql
+    └── test_sqlhandler.py
+```
+The folder */src* contains the SqlHandler-class and additionally the config file for the login credentials. The folder */test* contains the CI unit tests.
 
-`rpm -qa | grep mariadb`
+## Dependencies / Installation
+See https://github.com/clauskovacs/mysql-python-connect-test
 
-> mariadb-server-utils-10.3.22-1.fc30.x86_64  
-> mariadb-backup-10.3.22-1.fc30.x86_64  
-> mariadb-devel-10.3.22-1.fc30.x86_64  
-> mariadb-connector-c-config-3.1.7-1.fc30.noarch  
-> mariadb-server-10.3.22-1.fc30.x86_64  
-> mariadb-errmsg-10.3.22-1.fc30.x86_64  
-> mariadb-cracklib-password-check-10.3.22-1.fc30.x86_64  
-> mariadb-connector-c-3.1.7-1.fc30.x86_64  
-> mariadb-connector-c-devel-3.1.7-1.fc30.x86_64  
-> mariadb-10.3.22-1.fc30.x86_64  
-> mariadb-gssapi-server-10.3.22-1.fc30.x86_64  
-> mariadb-common-10.3.22-1.fc30.x86_64
+## Running the Program
+Import the file:
+`import sqlhandler`
 
-**Start the service using:**
+Create/Initialise a class object initialisation:
+`sqlhandlerObj = sqlhandler.SqlHandler()`
 
-`systemctl start mariadb.service`
+Invoke a database function, e.g.,:
+`getTableData = sqlhandlerObj.fetch_table_content(...)`
 
-**Connecting to the DB using a terminal:**
-
-`mysql -u root -p -h localhost`
-
-**Starting the service automatically when the OS loads:**
-
-`systemctl enable mariadb.service`
-
-### Connector
-**Installed repositories (not everyone may be necessary):**
-
-`rpm -qa | grep connector`
-
-> mysql-connector-python3-8.0.20-1.fc30.noarch  
-> mysql-connector-net-devel-6.9.9-8.fc30.x86_64  
-> mysql-connector-odbc-8.0.20-1.fc30.x86_64  
-> mariadb-connector-c-config-3.1.7-1.fc30.noarch  
-> mariadb-connector-c-3.1.7-1.fc30.x86_64  
-> mariadb-connector-c-devel-3.1.7-1.fc30.x86_64  
-> mysql-connector-net-6.9.9-8.fc30.x86_64
-
-### Python installs
-`pip list | grep -F mysql`
-
-> mysql-connector               2.2.9  
-> mysql-connector-python        8.0.25  
-> mysqlclient                   1.3.13
-
-## Running the Crawler
-Use the makefile to run the crawler.
-
+## Additionall Information
+This class and (some of its) functions have been used in:
+1. https://github.com/higgsAT/lecture-free-time-extract
