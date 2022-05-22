@@ -1,4 +1,4 @@
-name: tiss-crawler CI
+name: mysql-python-core
 on:
   push:
     branches:
