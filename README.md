@@ -1,4 +1,4 @@
-![](https://github.com/clauskovacs/tiss-crawler/workflows/tiss-crawler%20CI/badge.svg)
+![](https://github.com/clauskovacs/mysql-python-core/workflows/mysql-python-core/badge.svg)
 
 # tiss-crawler
 TISS (TU Wien Informations-Systeme & Services) Crawler 
