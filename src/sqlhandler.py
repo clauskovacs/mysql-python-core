@@ -37,7 +37,7 @@ class SqlHandler:
 		self.sql_login_password	= dbLoginPassword # loginCredentials.loginData["password"]
 		self.sql_login_host		= dbHostURL # loginCredentials.loginData["host"]
 
-	def fetch_all_db(self, verbose):
+	def fetch_all_db(self, verbose = False):
 		"""Retrieve / list all existing databases.
 
 		For the given SQL server connection, this function
@@ -62,7 +62,7 @@ class SqlHandler:
 
 		return return_all_db
 
-	def fetch_all_tables(self, select_database, verbose):
+	def fetch_all_tables(self, select_database, verbose = False):
 		"""Retrieve all tables from a given DB on the SQL server.
 
 		For a given database, this function returns all tables
@@ -87,7 +87,7 @@ class SqlHandler:
 
 		return return_all_tables
 
-	def fetch_table_content(self, select_database, select_table, verbose):
+	def fetch_table_content(self, select_database, select_table, verbose = False):
 		"""Fetch data from a given table for a selected database and table.
 
 		For a given database and table on a SQL server, this
@@ -129,7 +129,7 @@ class SqlHandler:
 
 		return return_table_contents, return_table_header_data
 
-	def insert_into_table(self, select_database, insert_statement, insert_data, verbose):
+	def insert_into_table(self, select_database, insert_statement, insert_data, verbose = False):
 		"""Insert data into a table of a database.
 
 		This functions inserts data (insert_data) into a table
