@@ -173,7 +173,7 @@ class SqlHandler:
 
 		for i in all_tables:
 			if i['Tables_in_'+select_database] == table_name:
-				print('table', table_name, "already exists in the DB")
+				print('create_table: table', table_name, "already exists in the DB")
 				table_exists = True
 				break
 
@@ -190,8 +190,22 @@ class SqlHandler:
 			host = self.sql_login_host,
 			database = select_database)
 		cursor = connection.cursor()
-		sql = "DROP TABLE " + delete_table
-		cursor.execute(sql) 
+
+		# check, whether the table to be deleted exists in the DB
+		all_tables = self.fetch_all_tables(select_database, 0)
+		table_exists = False
+
+		for i in all_tables:
+			if i['Tables_in_'+select_database] == delete_table:
+				table_exists = True
+				break
+
+		if table_exists == True:
+			sql = "DROP TABLE " + delete_table
+			cursor.execute(sql)
+		else:
+			print('drop_table: table', delete_table, "not found in the DB")
+
 		connection.close()
 
 	def truncate_table(self, select_database, truncate_table):
