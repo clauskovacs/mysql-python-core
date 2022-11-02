@@ -56,7 +56,7 @@ class SqlHandler:
 		connection.close()
 
 		# print all found databases (to the terminal)
-		if verbose == 1:
+		if verbose == True:
 			for row in return_all_db:
 				print (row['Database'])
 
@@ -81,7 +81,7 @@ class SqlHandler:
 
 		connection.close()
 
-		if verbose == 1:
+		if verbose == True:
 			for row in return_all_tables:
 				print (row['Tables_in_' + select_database])
 
@@ -111,7 +111,7 @@ class SqlHandler:
 		cursor.execute("SHOW COLUMNS FROM " + select_table)
 		return_table_header_data = cursor.fetchall()
 
-		if verbose == 1:
+		if verbose == True:
 			for row in return_table_header_data:
 				print(f"{row[0]:>20} ", end = '')
 			print('\n---------------------------------------------------')
@@ -122,7 +122,7 @@ class SqlHandler:
 
 		connection.close()
 
-		if verbose == 1:
+		if verbose == True:
 			for i in range(len(return_table_contents)):
 				print(return_table_contents[i])
 				#print(f"{str(return_table_contents[0][i]):>20} ", end = '')
@@ -144,7 +144,7 @@ class SqlHandler:
 			database = select_database)
 		cursor = connection.cursor()
 
-		if verbose == 1:
+		if verbose == True:
 			print("inserting into db: ", select_database,
 			": statement: ", insert_statement,
 			"; insertdata: ", insert_data)
@@ -153,7 +153,7 @@ class SqlHandler:
 		connection.commit()
 		connection.close()
 
-	def create_table(self, select_database, table_name, column_info):
+	def create_table(self, select_database, table_name, column_info, verbose = False):
 		"""Create a new table.
 
 		With the columns as given by column_info this function
@@ -172,13 +172,23 @@ class SqlHandler:
 		table_exists = False
 
 		for i in all_tables:
-			if i['Tables_in_'+select_database] == table_name:
-				print('create_table: table', table_name, "already exists in the DB")
+			if type(i['Tables_in_'+select_database]) == bytearray:
+				check_table_entry = i['Tables_in_'+select_database].decode('utf-8')
+			else:
+				check_table_entry = i['Tables_in_'+select_database]
+
+			if verbose == True:
+				print("checking table: " + check_table_entry)
+
+			if check_table_entry == table_name:
+				print("create_table: table '" + table_name + "' already exists in the DB")
 				table_exists = True
 				break
 
 		if table_exists == False:
 			cursor.execute("CREATE TABLE " + table_name + " (" + column_info + ")")
+			if verbose == True:
+				print("table '" + table_name + "' created")
 
 		connection.close()
 
@@ -223,7 +233,7 @@ class SqlHandler:
 			database = select_database)
 		cursor = connection.cursor()
 		sql = "TRUNCATE TABLE " + truncate_table
-		cursor.execute(sql) 
+		cursor.execute(sql)
 		connection.close()
 
 	def export_table(self, path, append_only, export_db, export_table):
