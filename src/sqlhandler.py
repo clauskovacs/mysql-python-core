@@ -78,14 +78,19 @@ class SqlHandler:
 
 		cursor.execute("SHOW TABLES")
 		return_all_tables = cursor.fetchall()
+		return_tables_function = []
 
 		connection.close()
 
-		if verbose == True:
-			for row in return_all_tables:
+		for row in return_all_tables:
+			if type(row['Tables_in_' + select_database]) == bytearray:
+				#check_table_entry = i['Tables_in_'+select_database].decode('utf-8')
+				row['Tables_in_' + select_database] = row['Tables_in_' + select_database].decode('utf-8')
+			if verbose == True:
 				print (row['Tables_in_' + select_database])
+			return_tables_function.append(row['Tables_in_' + select_database])
 
-		return return_all_tables
+		return return_tables_function
 
 	def fetch_table_content(self, select_database, select_table, verbose = False):
 		"""Fetch data from a given table for a selected database and table.
@@ -145,6 +150,7 @@ class SqlHandler:
 		cursor = connection.cursor()
 
 		# TODO: check, whether the table exists at all or this will raise an error at the moment
+		# insertStatement must be changed for that
 
 		if verbose == True:
 			print("inserting into db: ", select_database,
@@ -174,16 +180,12 @@ class SqlHandler:
 		table_exists = False
 
 		for i in all_tables:
-			if type(i['Tables_in_'+select_database]) == bytearray:
-				check_table_entry = i['Tables_in_'+select_database].decode('utf-8')
-			else:
-				check_table_entry = i['Tables_in_'+select_database]
-
 			if verbose == True:
-				print("checking table: " + check_table_entry)
+				print("checking table: " + i)
 
-			if check_table_entry == table_name:
-				print("create_table: table '" + table_name + "' already exists in the DB")
+			if i == table_name:
+				if verbose == True:
+					print("create_table: table '" + table_name + "' already exists in the DB")
 				table_exists = True
 				break
 
@@ -193,6 +195,7 @@ class SqlHandler:
 				print("table '" + table_name + "' created")
 
 		connection.close()
+		return table_exists
 
 	def drop_table(self, select_database, delete_table):
 		'''This function deletes a table from a selected database.'''
