@@ -144,6 +144,8 @@ class SqlHandler:
 			database = select_database)
 		cursor = connection.cursor()
 
+		# TODO: check, whether the table exists at all or this will raise an error at the moment
+
 		if verbose == True:
 			print("inserting into db: ", select_database,
 			": statement: ", insert_statement,
