@@ -100,11 +100,6 @@ class SqlHandler:
 		(e.g., row/column data, etc.). The verbose option
 		prints the retrieved information to the terminal.
 		"""
-
-		"""
-		TODO: change this function so it can only fetch a certain amount of data as well as
-		only retrieve the column types ("SHOW COLUMNS ...")
-		"""
 		connection = database.connect(
 			user = self.sql_login_user,
 			password = self.sql_login_password,
@@ -133,6 +128,47 @@ class SqlHandler:
 				#print(f"{str(return_table_contents[0][i]):>20} ", end = '')
 
 		return return_table_contents, return_table_header_data
+
+
+	def select_query(
+		self,
+		select_database,
+		select_table,
+		sql_values,
+		sql_where,
+		sql_select,
+		verbose = False
+	):
+		"""Perform a SELECT query on a table and return results.
+
+		This function returns the amount of rows from a query.
+		"""
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
+		cursor = connection.cursor()
+
+		# sanity check on the existance of the table
+		all_tables = self.fetch_all_tables(select_database, 0)
+		table_exists = False
+
+		for i in all_tables:
+			if i == select_table:
+				table_exists = True
+				break
+
+		# table found -> proceed with the query
+		if table_exists == True:
+			sql_query = sql_select + select_table + sql_where
+			cursor.execute(sql_query, sql_values)
+			result = cursor.fetchall()
+			connection.close()
+		else:
+			print("select_table_content: table '", select_table, "' is not in the DB")
+
+		return len(result)
 
 	def insert_into_table(self, select_database, insert_statement, insert_data, verbose = False):
 		"""Insert data into a table of a database.
