@@ -226,7 +226,7 @@ class SqlHandler:
 				break
 
 		if table_exists == False:
-			cursor.execute("CREATE TABLE " + table_name + " (" + column_info + ")")
+			cursor.execute("CREATE TABLE `" + table_name + "` (" + column_info + ")")
 			if verbose == True:
 				print("table '" + table_name + "' created")
 
