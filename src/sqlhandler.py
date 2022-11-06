@@ -161,7 +161,7 @@ class SqlHandler:
 
 		# table found -> proceed with the query
 		if table_exists == True:
-			sql_query = sql_select + select_table + sql_where
+			sql_query = sql_select + "`" + select_table + "`" + sql_where
 			cursor.execute(sql_query, sql_values)
 			result = cursor.fetchall()
 			connection.close()
