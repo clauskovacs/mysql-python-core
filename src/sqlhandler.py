@@ -15,6 +15,8 @@ dbHostURL = ""
 
 if my_file.is_file():
 	from config import *
+else:
+	print("could not find sql config file -> check path!")
 
 class SqlHandler:
 	"""This class handles access to the SQL server (connection, data manipulation, etc.).
@@ -164,9 +166,10 @@ class SqlHandler:
 			sql_query = sql_select + "`" + select_table + "`" + sql_where
 			cursor.execute(sql_query, sql_values)
 			result = cursor.fetchall()
-			connection.close()
 		else:
 			print("select_table_content: table '", select_table, "' is not in the DB")
+
+		connection.close()
 
 		return len(result)
 
