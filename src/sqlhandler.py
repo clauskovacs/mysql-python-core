@@ -26,18 +26,20 @@ class SqlHandler:
 	connection as well as access to the databases and tables
 	are provided in this class.
 	"""
-	def __init__(self):
+	def __init__(self, verbose = False):
 		"""Define the login credentials for accessing the database.
 
 		The credentials are the username, password and the host
 		where the SQL database(s) are located at.
 		"""
-		print ('creating sqlhandler class object (init)\n')
+		if verbose == True:
+			print ('creating sqlhandler class object (init)\n')
 
 		# set the login credentials
-		self.sql_login_user		= dbLoginUser # loginCredentials.loginData["user"]
-		self.sql_login_password	= dbLoginPassword # loginCredentials.loginData["password"]
-		self.sql_login_host		= dbHostURL # loginCredentials.loginData["host"]
+		self.sql_login_user		= dbLoginUser 		# loginCredentials.loginData["user"]
+		self.sql_login_password	= dbLoginPassword	# loginCredentials.loginData["password"]
+		self.sql_login_host		= dbHostURL			# loginCredentials.loginData["host"]
+
 
 	def fetch_all_db(self, verbose = False):
 		"""Retrieve / list all existing databases.
@@ -63,6 +65,7 @@ class SqlHandler:
 				print (row['Database'])
 
 		return return_all_db
+
 
 	def fetch_all_tables(self, select_database, verbose = False):
 		"""Retrieve all tables from a given DB on the SQL server.
@@ -94,7 +97,29 @@ class SqlHandler:
 
 		return return_tables_function
 
-	def fetch_table_content(self, select_database, select_table, verbose = False):
+	def count_table_entries(self, select_database, select_table, verbose = False):
+		"""Count numer of entries (rows) in table and return result.
+		"""
+		print("COUNT")
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
+		cursor = connection.cursor()
+
+		# fetch/print the header (table column names)
+		cursor.execute("SELECT COUNT(*) FROM " + select_table)
+		amount_table_rows = cursor.fetchall()
+
+		if (verbose == True):
+			print("number of rows in table '" + select_table + "': " + str(amount_table_rows[0][0]) )
+
+		return amount_table_rows[0][0]
+
+
+
+	def fetch_table_content(self, select_database, select_table, selector = "", verbose = False):
 		"""Fetch data from a given table for a selected database and table.
 
 		For a given database and table on a SQL server, this
@@ -119,7 +144,7 @@ class SqlHandler:
 			print('\n---------------------------------------------------')
 
 		# fetch/print the table column data
-		cursor.execute("SELECT * FROM " + select_table)
+		cursor.execute("SELECT * FROM " + select_table + " " + selector)
 		return_table_contents = cursor.fetchall()
 
 		connection.close()
@@ -173,6 +198,7 @@ class SqlHandler:
 
 		return len(result)
 
+
 	def insert_into_table(self, select_database, insert_statement, insert_data, verbose = False):
 		"""Insert data into a table of a database.
 
@@ -199,6 +225,35 @@ class SqlHandler:
 		cursor.execute(insert_statement, insert_data)
 		connection.commit()
 		connection.close()
+
+
+	def multiple_insert_into_table(self, select_database, insert_statement, insert_data, verbose = False):
+		"""Insert data into a table of a database.
+
+		This functions inserts data (insert_data) into a table
+		(defined in the insert statment: insert_data) of a
+		database (select_database). The verbose option
+		prints the retrieved information to the terminal.
+		"""
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
+		cursor = connection.cursor()
+
+		# TODO: check, whether the table exists at all or this will raise an error at the moment
+		# insertStatement must be changed for that
+
+		if verbose == True:
+			print("inserting into db: ", select_database,
+			": statement: ", insert_statement,
+			"; insertdata: ", insert_data)
+
+		cursor.executemany(insert_statement, insert_data)
+		connection.commit()
+		connection.close()
+
 
 	def create_table(self, select_database, table_name, column_info, verbose = False):
 		"""Create a new table.
@@ -236,6 +291,7 @@ class SqlHandler:
 		connection.close()
 		return table_exists
 
+
 	def drop_table(self, select_database, delete_table):
 		'''This function deletes a table from a selected database.'''
 		connection = database.connect(
@@ -262,6 +318,7 @@ class SqlHandler:
 
 		connection.close()
 
+
 	def truncate_table(self, select_database, truncate_table):
 		"""Clear (truncate) a table.
 
@@ -279,6 +336,7 @@ class SqlHandler:
 		sql = "TRUNCATE TABLE " + truncate_table
 		cursor.execute(sql)
 		connection.close()
+
 
 	def export_table(self, path, append_only, export_db, export_table):
 		"""Export a table from the SQL server to a (local) file on the disk.
@@ -371,6 +429,7 @@ class SqlHandler:
 
 		file_export_table.close()
 
+
 	def import_table(self, path, import_target_db):
 		"""Import a (local) file into the SQL server.
 
@@ -389,7 +448,7 @@ class SqlHandler:
 		Date datetime NOT NULL
 		) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-		INSERT INTO `2013__2013_02_28_23_55_21` (`IP`, `Date`) VALUES 
+		INSERT INTO `2013__2013_02_28_23_55_21` (`IP`, `Date`) VALUES
 		('00.111.75.177', '2000-02-01 00:46:30'),
 		('66.249.78.123', '2013-02-01 01:14:59'),
 		('79.208.109.187', '2013-02-01 01:15:14'),
@@ -467,6 +526,7 @@ class SqlHandler:
 
 						self.insert_into_table(import_target_db, insertStatement, insertData, 0)
 
+
 	def determine_endpoint(self, process_str):
 		"""Helper function used by extractInsertInformation() to extract data endpoints.
 
@@ -492,6 +552,7 @@ class SqlHandler:
 			end_str = ','
 
 		return end_str
+
 
 	def extractInsertInformation(self, read_insert_line, column_type):
 		"""Used by the function import_table() to read disk data containing SQL info.
@@ -578,6 +639,7 @@ class SqlHandler:
 
 		return tuple(return_extracted_data)
 
+
 	def extract_table_headers(self, read_insert_line):
 		"""Used by import_table() this function extracts info from the INSERT INTO line.
 
@@ -599,3 +661,88 @@ class SqlHandler:
 		return_columns = read_insert_line[bracket_pos_cut_start+2:bracket_pos_cut_end-1].replace(", `", "").split('`')
 
 		return return_table_name, return_columns
+
+
+	def update_table(
+		self,
+		select_database,
+		select_table,
+		update_data,
+		where_data,
+		verbose = False
+	):
+		"""Update a table.
+
+		Argument(s):
+			o)select_database: selected database for update
+			o)	select_table: table which should be manipulated
+			o)	update_data: part of the query ("SET-part")
+			o)	where_data: part of the query ("WHERE-part")
+			o)	verbose: print information about the process
+
+		Return(s):
+			-
+		"""
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
+		cursor = connection.cursor()
+
+		# TODO: check, whether the table exists at all or this will raise an error at the moment
+
+		if verbose == True:
+			print("udpating table in db: ", select_database,
+			": update_data: ", update_data,
+			"; where_data: ", where_data)
+
+		update_statement = "UPDATE " + select_table + " SET " + update_data + " WHERE " + where_data
+		cursor.execute(update_statement)
+		connection.commit()
+		connection.close()
+
+	def multiple_update(
+		self,
+		select_database,
+		select_table,
+		update_instructions,
+		update_records,
+		verbose = False
+	):
+		"""Update multiple values using a single query
+
+		Argument(s):
+			o)	select_database: database where the table resides
+			o)	select_table: table(name) where the data should be updated
+			o)	update_instructions: Update instruction, e.g., "a = %s where b = %s"
+			o)	update_records: data which should be changed according to the instructions, e.g.,
+				update_records = [(665, 5), (615562, 2)]
+			o)	verbose: If enabled (True): print info about the process
+
+		Return(s):
+			o)	cursor.rowcount: Amount of rows changed during the query
+		"""
+		connection = database.connect(
+			user = self.sql_login_user,
+			password = self.sql_login_password,
+			host = self.sql_login_host,
+			database = select_database)
+		cursor = connection.cursor()
+
+		if verbose == True:
+			print("multiple update into db: ", select_database,
+			"select_table: ", select_table,
+			": update_instructions: ", update_instructions,
+			"; update_records: ", update_records)
+
+		update_query = "Update `" + select_table + "`set " + update_instructions
+
+		# multiple records to be updated in tuple format
+		cursor.executemany(update_query, update_records)
+		connection.commit()
+
+		if verbose == True:
+			print("amount of rows affected by the query: " + str(cursor.rowcount) )
+
+		return cursor.rowcount
